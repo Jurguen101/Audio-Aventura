@@ -22,17 +22,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Density
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.LayoutDirection
 
-// Color Palette for Paper Mario Cardboard theme
+// Color Palette for Paper Mario Cardboard theme (Updated to Kraft Aesthetic)
 object PaperMarioColors {
-    val CardboardTan = Color(0xFFE5CE9F)      // Classic craft paper base
-    val CardboardDark = Color(0xFFC0A473)     // Darker cardboard shading
-    val BorderBrown = Color(0xFF332011)       // Outlines resembling heavy ink/pencil
-    val PaperWhite = Color(0xFFFFFDF7)        // Bright textured paper
-    val SkyBlue = Color(0xFF86D5F8)           // Vivid sky blue
-    val GrassGreen = Color(0xFF76C447)        // Storybook grass
-    val StageRed = Color(0xFFD32F2F)          // Theater stage curtain red
-    val BannerYellow = Color(0xFFFFD54F)      // Bright stars/bannering
+    val CardboardTan = Color(0xFFD4B595)      // Kraft Base
+    val CardboardDark = Color(0xFFA67F59)     // Darker kraft shading / corrugated shadow
+    val BorderBrown = Color(0xFF1E1E1E)       // Ink black for stamps and borders
+    val PaperWhite = Color(0xFFE9E4D4)        // Recycled paper white
+    val SkyBlue = Color(0xFF86D5F8)           // Vivid sky blue (kept for contrast)
+    val GrassGreen = Color(0xFF76C447)        // Storybook grass (kept for contrast)
+    val StageRed = Color(0xFF9E3636)          // Stamp red
+    val BannerYellow = Color(0xFFF2C94C)      // Muted yellow
 }
 
 @Composable
@@ -44,8 +61,39 @@ fun CardboardContainer(
     hasStitches: Boolean = true,
     content: @Composable BoxScope.() -> Unit
 ) {
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        visible = true
+    }
+
+    val rotationX by animateFloatAsState(
+        targetValue = if (visible) 0f else -60f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
+        label = "rotation"
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.8f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
+        label = "scale"
+    )
+
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+        label = "alpha"
+    )
+
     Box(
         modifier = modifier
+            .graphicsLayer {
+                this.alpha = alpha
+                this.scaleX = scale
+                this.scaleY = scale
+                this.rotationX = rotationX
+                cameraDistance = 12 * density
+            }
             // Drop shadow for that layered cutout look
             .shadow(
                 elevation = 6.dp,
@@ -81,6 +129,35 @@ fun CardboardContainer(
     }
 }
 
+
+class TornPaperShape(private val roughness: Float = 10f) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        val path = Path().apply {
+            moveTo(0f, 0f)
+            lineTo(size.width, 0f)
+            lineTo(size.width, size.height)
+            
+            // Torn bottom edge
+            var currentX = size.width
+            var goingUp = false
+            while (currentX > 0) {
+                currentX -= roughness
+                if (currentX < 0) currentX = 0f
+                val y = if (goingUp) size.height - roughness else size.height
+                lineTo(currentX, y)
+                goingUp = !goingUp
+            }
+            lineTo(0f, size.height)
+            close()
+        }
+        return Outline.Generic(path)
+    }
+}
+
 @Composable
 fun PaperCard(
     modifier: Modifier = Modifier,
@@ -88,16 +165,48 @@ fun PaperCard(
     borderColor: Color = PaperMarioColors.BorderBrown,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        visible = true
+    }
+
+    val rotationX by animateFloatAsState(
+        targetValue = if (visible) 0f else -60f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
+        label = "rotation"
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.8f,
+        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
+        label = "scale"
+    )
+
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+        label = "alpha"
+    )
+
     Column(
         modifier = modifier
+            .graphicsLayer {
+                this.alpha = alpha
+                this.scaleX = scale
+                this.scaleY = scale
+                this.rotationX = rotationX
+                cameraDistance = 12 * density
+            }
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(8.dp),
-                ambientColor = Color.Black.copy(alpha = 0.3f)
+                elevation = 6.dp,
+                shape = TornPaperShape(roughness = 12f),
+                ambientColor = Color.Black.copy(alpha = 0.5f)
             )
-            .background(backgroundColor, RoundedCornerShape(8.dp))
-            .border(2.dp, borderColor, RoundedCornerShape(8.dp))
+            .background(backgroundColor, TornPaperShape(roughness = 12f))
+            .border(2.dp, borderColor, TornPaperShape(roughness = 12f))
             .padding(14.dp)
+            .padding(bottom = 8.dp) // extra padding for the torn edge
     ) {
         content()
     }
@@ -130,12 +239,11 @@ fun StickerCharacter(
                 .background(Color.White, RoundedCornerShape(size / 3))
                 // Layer 3: Thick stylized black pencil border
                 .border(2.5.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(size / 3))
-                .padding(4.dp)
+                .padding(12.dp) // Adjusted padding for CharacterGraphic
         ) {
-            Text(
-                text = emoji,
-                fontSize = (size.value * 0.55f).sp,
-                textAlign = TextAlign.Center
+            CharacterGraphic(
+                emoji = emoji,
+                modifier = Modifier.fillMaxSize()
             )
         }
 
@@ -245,5 +353,97 @@ fun ScissorCutDecoration(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text("✂️ - - - - - - - - - - - - - - - - - - -", color = color.copy(alpha = 0.5f), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun AnimatedCardboardPopup(
+    modifier: Modifier = Modifier,
+    delayMillis: Int = 0,
+    content: @Composable () -> Unit
+) {
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        kotlinx.coroutines.delay(delayMillis.toLong())
+        visible = true
+    }
+
+    val rotationX by animateFloatAsState(
+        targetValue = if (visible) 0f else -75f,
+        animationSpec = spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessLow),
+        label = "rotation"
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.8f,
+        animationSpec = spring(dampingRatio = 0.5f, stiffness = Spring.StiffnessLow),
+        label = "scale"
+    )
+
+    val alpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing),
+        label = "alpha"
+    )
+
+    Box(
+        modifier = modifier.graphicsLayer {
+            this.alpha = alpha
+            this.scaleX = scale
+            this.scaleY = scale
+            this.rotationX = rotationX
+            cameraDistance = 8 * density
+        }
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun DioramaAppWrapper(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                androidx.compose.ui.graphics.Brush.radialGradient(
+                    colors = listOf(Color(0xFF8D5A36), Color(0xFF3B1E0A)),
+                    center = Offset(0.5f, 0.5f)
+                )
+            )
+    ) {
+        // Wooden desk texture
+        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize()) {
+            val woodColor = Color(0xFF1E0F07)
+            val width = size.width
+            val height = size.height
+            for (y in listOf(0.15f, 0.35f, 0.55f, 0.75f, 0.95f)) {
+                drawLine(
+                    color = woodColor.copy(alpha = 0.3f),
+                    start = Offset(0f, height * y),
+                    end = Offset(width, height * y),
+                    strokeWidth = 4f
+                )
+            }
+        }
+        
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(0.dp)
+                .graphicsLayer {
+                    rotationX = 12f
+                    rotationY = -2f
+                    scaleX = 0.94f
+                    scaleY = 0.94f
+                    cameraDistance = 14 * density
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            content()
+        }
     }
 }

@@ -1,40 +1,474 @@
 package com.example.ui.screens
 
-import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarHalf
+
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.StoryChapter
 import com.example.ui.MainViewModel
 import com.example.ui.Screen
 import com.example.ui.components.*
+import com.example.data.UserProgress
+import kotlinx.coroutines.launch
+
+@Composable
+fun HomeScreen(
+    viewModel: MainViewModel,
+    modifier: Modifier = Modifier
+) {
+    val chapters by viewModel.allChapters.collectAsState()
+    val progress by viewModel.userProgress.collectAsState()
+    val characters by viewModel.allCharacters.collectAsState()
+    val starsCount = progress?.starsCount ?: 0
+    val wildcardsCount = progress?.wildcardsCount ?: 0
+    val activePetId = progress?.activePetId
+    val activePet = characters.find { it.id == activePetId }
+
+    val totalPages = if (chapters.isNotEmpty()) chapters.size + 1 else 0
+    val pagerState = rememberPagerState(pageCount = { totalPages })
+    val coroutineScope = rememberCoroutineScope()
+    var showResetWarning by remember { mutableStateOf(false) }
+    var selectedChapterForSynopsis by remember { mutableStateOf<StoryChapter?>(null) }
+
+    if (selectedChapterForSynopsis != null) {
+        val chapter = selectedChapterForSynopsis!!
+        AlertDialog(
+            onDismissRequest = { selectedChapterForSynopsis = null },
+            title = { Text(text = chapter.title, fontWeight = FontWeight.Bold, color = PaperMarioColors.StageRed) },
+            text = { Text(text = chapter.description, color = PaperMarioColors.BorderBrown) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.startChapter(chapter.id)
+                    viewModel.navigateTo(Screen.Story)
+                    selectedChapterForSynopsis = null
+                }) {
+                    Text("Aceptar", color = PaperMarioColors.StageRed, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { selectedChapterForSynopsis = null }) {
+                    Text("Declinar", color = PaperMarioColors.BorderBrown, fontWeight = FontWeight.Bold)
+                }
+            },
+            containerColor = PaperMarioColors.PaperWhite
+        )
+    }
+
+    if (showResetWarning) {
+        AlertDialog(
+            onDismissRequest = { showResetWarning = false },
+            title = { Text(text = "⚠️ Atención", fontWeight = FontWeight.Bold, color = PaperMarioColors.StageRed) },
+            text = { Text(text = "¿Estás seguro de que deseas borrar todo el progreso? Esto reiniciará todas tus estrellas, mascotas y niveles desbloqueados.", color = PaperMarioColors.BorderBrown) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.resetAllAppProgress()
+                    showResetWarning = false
+                }) {
+                    Text("Reiniciar", color = Color.Red, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetWarning = false }) {
+                    Text("Cancelar", color = PaperMarioColors.BorderBrown, fontWeight = FontWeight.Bold)
+                }
+            },
+            containerColor = PaperMarioColors.PaperWhite
+        )
+    }
+
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
+        // Open Book Layout
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            // Book cover / pages
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .shadow(16.dp, RoundedCornerShape(16.dp))
+                    .background(PaperMarioColors.PaperWhite, RoundedCornerShape(16.dp))
+            ) {
+                // Left page: Assistant & Stats
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        // Top Stats
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+                        ) {
+                            CardboardContainer(backgroundColor = Color.White, hasStitches = false) {
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) {
+                                    androidx.compose.material3.Icon(Icons.Filled.Star, contentDescription="Star", tint=Color(0xFFFFD700), modifier=Modifier.size(24.dp))
+                                    Text("$starsCount", fontSize = 20.sp, fontWeight = FontWeight.Black, color = PaperMarioColors.BorderBrown)
+                                }
+                            }
+                            CardboardContainer(backgroundColor = Color.White, hasStitches = false) {
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)) {
+                                    androidx.compose.material3.Icon(Icons.Filled.StarHalf, contentDescription="Wildcard", tint=Color(0xFF9C27B0), modifier=Modifier.size(24.dp))
+                                    Text("$wildcardsCount", fontSize = 20.sp, fontWeight = FontWeight.Black, color = PaperMarioColors.BorderBrown)
+                                }
+                            }
+                        }
+
+                        // Beautiful Tienda Button
+                        ChunkyGameButton(
+                            onClick = { viewModel.navigateTo(Screen.Characters) },
+                            containerColor = Color(0xFFF1C40F),
+                            bevelColor = Color(0xFFF39C12),
+                            borderColor = Color(0xFFD35400),
+                            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
+                                androidx.compose.material3.Icon(Icons.Filled.ShoppingCart, contentDescription="Store", tint=Color.White, modifier=Modifier.size(28.dp).padding(end = 12.dp))
+                                Text("TIENDA DE MASCOTAS", color = Color.White, fontWeight = FontWeight.Black, fontSize = 16.sp)
+                            }
+                        }
+
+                        AchievementsPanel(progress = progress ?: UserProgress(), chapters = chapters, characters = characters)
+
+                        // Virtual Assistant
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                            verticalArrangement = Arrangement.Bottom,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            if (activePet != null) {
+                                CardboardContainer(
+                                    modifier = Modifier.padding(bottom = 16.dp),
+                                    backgroundColor = Color.White
+                                ) {
+                                    Text(
+                                        text = "¡Hola! Desliza para explorar los cuentos y pulsa JUGAR.",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PaperMarioColors.BorderBrown,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.padding(8.dp)
+                                    )
+                                }
+                                StickerCharacter(
+                                    emoji = activePet.emoji,
+                                    size = 120.dp,
+                                    hasPedestal = true,
+                                    modifier = Modifier.clickable {
+                                        com.example.utils.SoundManager.playPop()
+                                        viewModel.speakText(activePet.soundPhrase)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Book Spine
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(24.dp)
+                        .background(
+                            Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color(0x1A000000),
+                                    Color(0x33000000),
+                                    Color(0x4D000000),
+                                    Color(0x33000000),
+                                    Color(0x1A000000),
+                                    Color.Transparent
+                                )
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        repeat(10) {
+                            Box(modifier = Modifier.size(6.dp).background(PaperMarioColors.BorderBrown.copy(alpha = 0.5f), CircleShape))
+                        }
+                    }
+                }
+                // Right page: The Diorama Pager
+                Box(
+                    modifier = Modifier
+                        .weight(1.5f)
+                        .fillMaxHeight()
+                        .padding(16.dp)
+                ) {
+                    if (chapters.isNotEmpty()) {
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier.fillMaxSize()
+                        ) { page ->
+                            if (page < chapters.size) {
+                                val chapter = chapters[page]
+                                DioramaPage(
+                                    chapter = chapter,
+                                    onPlayClick = {
+                                        selectedChapterForSynopsis = chapter
+                                    }
+                                )
+                            } else {
+                                val allCompleted = chapters.isNotEmpty() && chapters.all { it.completed }
+                                CreditsTriggerPage(
+                                    allCompleted = allCompleted,
+                                    onTriggerClick = { viewModel.navigateTo(Screen.FinalCredits) }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Pager Indicators
+            if (chapters.isNotEmpty()) {
+                Row(
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 8.dp, end = 32.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    repeat(totalPages) { iteration ->
+                        val color = if (pagerState.currentPage == iteration) PaperMarioColors.StageRed else PaperMarioColors.BorderBrown.copy(alpha = 0.3f)
+                        Box(
+                            modifier = Modifier
+                                .padding(2.dp)
+                                .size(12.dp)
+                                .background(color, CircleShape)
+                        )
+                    }
+                }
+            }
+        } // Closes Open Book Layout Box
+        
+        // Top Right Action Buttons
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            androidx.compose.material3.IconButton(
+                onClick = { com.example.utils.SoundManager.toggleBgm() },
+                modifier = Modifier
+                    .background(PaperMarioColors.SkyBlue, CircleShape)
+                    .size(40.dp)
+            ) {
+                androidx.compose.material3.Icon(
+                    imageVector = if (com.example.utils.SoundManager.isBgmEnabled.value) 
+                        Icons.Filled.Notifications 
+                    else 
+                        Icons.Filled.Close,
+                    contentDescription = "Toggle BGM",
+                    tint = Color.White
+                )
+            }
+            androidx.compose.material3.IconButton(
+                onClick = { showResetWarning = true },
+                modifier = Modifier
+                    .background(Color(0xFFE67E22), CircleShape)
+                    .size(40.dp)
+            ) {
+                androidx.compose.material3.Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "Reset Progress",
+                    tint = Color.White
+                )
+            }
+        }
+    } // Closes Outer Box
+} // Closes HomeScreen
+
+@Composable
+
+fun DioramaPage(chapter: StoryChapter, onPlayClick: () -> Unit) {
+    val infiniteTransition = rememberInfiniteTransition(label = "diorama_animation")
+    val cloudOffset by infiniteTransition.animateFloat(
+        initialValue = -10f,
+        targetValue = 10f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "cloud"
+    )
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Title
+        PaperBanner(
+            text = chapter.title.uppercase(),
+            backgroundColor = PaperMarioColors.StageRed,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // 2.5D Diorama Scene
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .graphicsLayer {
+                    rotationX = 15f
+                    cameraDistance = 8 * density
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            // Background Sky / Scene
+            CardboardContainer(
+                modifier = Modifier.fillMaxSize(),
+                backgroundColor = PaperMarioColors.SkyBlue,
+                hasStitches = false
+            ) {
+                // Clouds
+                Text(
+                    "☁️",
+                    fontSize = 60.sp,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .offset(x = 20.dp + cloudOffset.dp, y = 20.dp)
+                        .graphicsLayer { shadowElevation = 10f }
+                )
+                Text(
+                    "☁️",
+                    fontSize = 50.sp,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .offset(x = (-30).dp - cloudOffset.dp, y = 40.dp)
+                        .graphicsLayer { shadowElevation = 15f }
+                )
+
+                // Ground
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.4f)
+                        .background(PaperMarioColors.GrassGreen)
+                )
+
+                // Decor (Trees, Houses)
+                Text(
+                    "🌲",
+                    fontSize = 70.sp,
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .offset(x = 30.dp, y = (-20).dp)
+                        .graphicsLayer { shadowElevation = 20f }
+                )
+                
+                Text(
+                    "🏠",
+                    fontSize = 80.sp,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .offset(x = (-20).dp, y = (-10).dp)
+                        .graphicsLayer { shadowElevation = 25f }
+                )
+
+                // Main Character
+                StickerCharacter(
+                    emoji = if (chapter.unlocked) chapter.emoji else "🔒",
+                    size = 130.dp,
+                    hasPedestal = true,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .offset(y = 20.dp)
+                        .graphicsLayer { 
+                            shadowElevation = 40f 
+                        }
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Actions
+        if (chapter.unlocked) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                repeat(5) { idx ->
+                    Text(
+                        text = if (idx < chapter.starsEarned) "⭐" else "☆",
+                        fontSize = 24.sp,
+                        color = if (idx < chapter.starsEarned) Color(0xFFFFC107) else Color(0x55000000)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            ChunkyGameButton(
+                onClick = onPlayClick,
+                containerColor = PaperMarioColors.StageRed,
+                bevelColor = Color(0xFF7F0000)
+            ) {
+                Text("JUGAR", fontSize = 24.sp, fontWeight = FontWeight.Black, color = Color.White)
+            }
+        } else {
+            CardboardContainer(backgroundColor = Color(0xFFEBE5DB)) {
+                Text(
+                    "Bloqueado\n¡Supera el nivel anterior!",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    color = PaperMarioColors.BorderBrown.copy(alpha = 0.6f),
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun ChunkyGameButton(
@@ -82,667 +516,69 @@ fun ChunkyGameButton(
 }
 
 @Composable
-fun HomeScreen(
-    viewModel: MainViewModel,
-    modifier: Modifier = Modifier
-) {
-    val chapters by viewModel.allChapters.collectAsState()
-    val progress by viewModel.userProgress.collectAsState()
-    val characters by viewModel.allCharacters.collectAsState()
-    val starsCount = progress?.starsCount ?: 0
-    val wildcardsCount = progress?.wildcardsCount ?: 0
-    val activePetId = progress?.activePetId
-    val activePet = characters.find { it.id == activePetId }
-    
-    val narratorSpeed by viewModel.narratorSpeed.collectAsState()
-    val narratorPitch by viewModel.narratorPitch.collectAsState()
-
-    var showResetWarning by remember { mutableStateOf(false) }
-
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
-
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(Color(0xFF8D5A36), Color(0xFF3B1E0A)),
-                    center = Offset(0.5f, 0.5f)
-                )
-            )
+fun CreditsTriggerPage(allCompleted: Boolean, onTriggerClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 1. Vector background decoration: Cozy desk plank lines
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val woodColor = Color(0xFF1E0F07)
-            val width = size.width
-            val height = size.height
-            
-            // Wood plank horizontal joints
-            for (y in listOf(0.15f, 0.35f, 0.55f, 0.75f, 0.95f)) {
-                drawLine(
-                    color = woodColor.copy(alpha = 0.3f),
-                    start = Offset(0f, height * y),
-                    end = Offset(width, height * y),
-                    strokeWidth = 4f
-                )
-            }
-
-            // Warm golden candle glow
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0xFFFFF59D).copy(alpha = 0.25f), Color.Transparent),
-                    center = Offset(width * 0.92f, height * 0.15f),
-                    radius = width * 0.25f
-                )
-            )
-        }
-
-        if (isLandscape) {
-            // LANDSCAPE: Classic Open Book Layout (Side by Side Pages)
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp, vertical = 12.dp)
-                    .shadow(14.dp, RoundedCornerShape(20.dp))
-                    .background(Color(0xFF703E1E), RoundedCornerShape(20.dp)) // Rich leather cover backing
-                    .border(4.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(20.dp))
-                    .padding(4.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFFFFFDF2), RoundedCornerShape(16.dp)) // Ivory paper book pages
-                        .border(2.5.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(16.dp))
-                ) {
-                    // LEFT PAGE (Mascot, Pocket Stats, Narrator Voice Panel)
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1f)
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // Title Logo
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Box(
-                                modifier = Modifier
-                                    .background(Color(0xFFFFD54F), RoundedCornerShape(12.dp))
-                                    .border(2.5.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(12.dp))
-                                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                            ) {
-                                Text(
-                                    text = "✨ AUDIOAVENTURA ✨",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Black,
-                                    color = PaperMarioColors.BorderBrown,
-                                    letterSpacing = 1.sp
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(3.dp))
-                            Text(
-                                text = "Teatro de Cuentos Ilustrados 2D",
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = PaperMarioColors.BorderBrown.copy(alpha = 0.7f)
-                            )
-                        }
-
-                        // Welcome Mascot
-                        CardboardContainer(
-                            modifier = Modifier.fillMaxWidth(),
-                            backgroundColor = Color.White,
-                            cornerRadius = 12.dp,
-                            hasStitches = true
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                                modifier = Modifier.padding(2.dp)
-                            ) {
-                                if (activePet != null) {
-                                    Box(modifier = Modifier.clickable { 
-                                        com.example.utils.SoundManager.playPop()
-                                        viewModel.speakText(activePet.soundPhrase) 
-                                    }) {
-                                        StickerCharacter(
-                                            emoji = activePet.emoji,
-                                            size = 46.dp,
-                                            hasPedestal = true
-                                        )
-                                    }
-                                } else {
-                                    StickerCharacter(
-                                        emoji = "🦝",
-                                        size = 46.dp,
-                                        hasPedestal = true
-                                    )
-                                }
-                                Column {
-                                    Text(
-                                        text = if (activePet != null) "Compañero: ${activePet.name}" else "¡Hola Aventurero!",
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.Black,
-                                        color = PaperMarioColors.BorderBrown
-                                    )
-                                    Text(
-                                        text = "¡Narración con voz súper natural de cuento de hadas!",
-                                        fontSize = 10.sp,
-                                        color = PaperMarioColors.BorderBrown.copy(alpha = 0.8f)
-                                    )
-                                }
-                            }
-                        }
-
-                        // Stats Pocket Row
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color(0xFFEAF2F8), RoundedCornerShape(12.dp))
-                                .border(2.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(12.dp))
-                                .padding(horizontal = 12.dp, vertical = 6.dp),
-                            horizontalArrangement = Arrangement.SpaceAround,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("⭐", fontSize = 20.sp)
-                                Column {
-                                    Text("Estrellas", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = PaperMarioColors.BorderBrown.copy(alpha = 0.5f))
-                                    Text("$starsCount", fontSize = 14.sp, fontWeight = FontWeight.Black, color = PaperMarioColors.BorderBrown)
-                                }
-                            }
-                            Box(modifier = Modifier.width(1.5.dp).height(20.dp).background(PaperMarioColors.BorderBrown.copy(alpha = 0.15f)))
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text("🃏", fontSize = 20.sp)
-                                Column {
-                                    Text("Comodines", fontSize = 8.sp, fontWeight = FontWeight.Bold, color = PaperMarioColors.BorderBrown.copy(alpha = 0.5f))
-                                    Text("$wildcardsCount", fontSize = 14.sp, fontWeight = FontWeight.Black, color = PaperMarioColors.BorderBrown)
-                                }
-                            }
-                        }
-
-                        // Navigation Action Buttons
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            ChunkyGameButton(
-                                onClick = { viewModel.navigateTo(Screen.Characters) },
-                                containerColor = Color(0xFFD32F2F),
-                                bevelColor = Color(0xFF991B1B),
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Text("TIENDA 🎪", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.White)
-                            }
-                        }
-                    }
-
-                    // BOOK SPINE CREASE
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(22.dp)
-                            .background(
-                                Brush.horizontalGradient(
-                                    colors = listOf(
-                                        Color.Transparent,
-                                        Color(0x0C000000),
-                                        Color(0x2A000000),
-                                        Color(0x42000000),
-                                        Color(0x2A000000),
-                                        Color(0x0C000000),
-                                        Color.Transparent
-                                    )
-                                )
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxHeight(),
-                            verticalArrangement = Arrangement.SpaceAround,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            repeat(8) {
-                                Box(modifier = Modifier.size(4.dp).background(PaperMarioColors.BorderBrown.copy(alpha = 0.4f), CircleShape))
-                            }
-                        }
-                    }
-
-                    // RIGHT PAGE (Index List of Stories)
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .weight(1.1f)
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "📖 INDICE DE CUENTOS",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Black,
-                            color = PaperMarioColors.BorderBrown,
-                            modifier = Modifier.padding(bottom = 6.dp)
-                        )
-
-                        LazyColumn(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .background(Color(0xFFFFFDF9), shape = RoundedCornerShape(14.dp))
-                                .border(2.5.dp, PaperMarioColors.BorderBrown, shape = RoundedCornerShape(14.dp))
-                                .padding(8.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(chapters) { chapter ->
-                                val isUnlocked = chapter.unlocked
-                                val isCompleted = chapter.completed
-
-                                val bg = if (isUnlocked) {
-                                    when (chapter.id) {
-                                        "ninja" -> Color(0xFFEBF5FB)
-                                        "fantasma" -> Color(0xFFF5EEF8)
-                                        "vaquero" -> Color(0xFFFEF9E7)
-                                        "rey" -> Color(0xFFEAFAF1)
-                                        "robot" -> Color(0xFFFDF2E9)
-                                        else -> Color.White
-                                    }
-                                } else {
-                                    Color(0xFFEBE5DB)
-                                }
-
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .shadow(if (isUnlocked) 2.dp else 0.dp, RoundedCornerShape(12.dp))
-                                        .background(bg, RoundedCornerShape(12.dp))
-                                        .border(2.dp, if (isUnlocked) PaperMarioColors.BorderBrown else Color(0x33332011), RoundedCornerShape(12.dp))
-                                        .padding(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
-                                    StickerCharacter(
-                                        emoji = if (isUnlocked) chapter.emoji else "🔒",
-                                        size = 40.dp,
-                                        hasPedestal = isUnlocked
-                                    )
-
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text(
-                                            text = chapter.title,
-                                            fontSize = 13.sp,
-                                            fontWeight = FontWeight.Black,
-                                            color = if (isUnlocked) PaperMarioColors.BorderBrown else PaperMarioColors.BorderBrown.copy(alpha = 0.5f)
-                                        )
-                                        if (isUnlocked) {
-                                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                                repeat(5) { idx ->
-                                                    Text(
-                                                        text = if (idx < chapter.starsEarned) "⭐" else "☆",
-                                                        fontSize = 10.sp,
-                                                        color = if (idx < chapter.starsEarned) Color(0xFFFFC107) else Color(0x33332011)
-                                                    )
-                                                }
-                                                if (isCompleted) {
-                                                    Text(" • ✅ Completado", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF27AE60))
-                                                }
-                                            }
-                                        } else {
-                                            Text("¡Completa el cuento anterior!", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF7F8C8D))
-                                        }
-                                    }
-
-                                    if (isUnlocked) {
-                                        ChunkyGameButton(
-                                            onClick = {
-                                                viewModel.selectPreviewChapter(chapter.id)
-                                                viewModel.navigateTo(Screen.StoryPreview)
-                                            },
-                                            containerColor = Color(0xFF4CAF50),
-                                            bevelColor = Color(0xFF2E7D32),
-                                            modifier = Modifier.width(72.dp)
-                                        ) {
-                                            Text("JUGAR ▶", fontSize = 8.5.sp, fontWeight = FontWeight.Black, color = Color.White)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            // PORTRAIT: Vertically Stacked Scrollable Notebook Layout (Fits Portrait Perfectly!)
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp)
-                    .shadow(12.dp, RoundedCornerShape(18.dp))
-                    .background(Color(0xFF703E1E), RoundedCornerShape(18.dp))
-                    .border(3.5.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(18.dp))
-                    .padding(3.dp)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color(0xFFFFFDF2), RoundedCornerShape(14.dp))
-                        .border(2.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(14.dp))
-                        .verticalScroll(rememberScrollState())
-                        .padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Title Logo Banner
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Box(
-                            modifier = Modifier
-                                .background(Color(0xFFFFD54F), RoundedCornerShape(12.dp))
-                                .border(2.5.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(12.dp))
-                                .padding(horizontal = 20.dp, vertical = 8.dp)
-                        ) {
-                            Text(
-                                text = "✨ AUDIOAVENTURA ✨",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Black,
-                                color = PaperMarioColors.BorderBrown,
-                                letterSpacing = 1.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Teatro de Cuentos Ilustrados 2D",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PaperMarioColors.BorderBrown.copy(alpha = 0.7f)
-                        )
-                    }
-
-                    // Welcome Card
-                    CardboardContainer(
-                        modifier = Modifier.fillMaxWidth(),
-                        backgroundColor = Color.White,
-                        cornerRadius = 12.dp,
-                        hasStitches = true
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            StickerCharacter(
-                                emoji = "🦝",
-                                size = 52.dp,
-                                hasPedestal = true
-                            )
-                            Column {
-                                Text(
-                                    text = "¡Hola Aventurero!",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Black,
-                                    color = PaperMarioColors.BorderBrown
-                                )
-                                Text(
-                                    text = "Elige un cuento para abrir su escenario de cartón interactivo.",
-                                    fontSize = 11.sp,
-                                    color = PaperMarioColors.BorderBrown.copy(alpha = 0.8f)
-                                )
-                            }
-                        }
-                    }
-
-                    // Stats Dashboard
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFEAF2F8), RoundedCornerShape(12.dp))
-                            .border(2.dp, PaperMarioColors.BorderBrown, RoundedCornerShape(12.dp))
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("⭐", fontSize = 24.sp)
-                            Column {
-                                Text("Estrellas", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = PaperMarioColors.BorderBrown.copy(alpha = 0.5f))
-                                Text("$starsCount", fontSize = 16.sp, fontWeight = FontWeight.Black, color = PaperMarioColors.BorderBrown)
-                            }
-                        }
-                        Box(modifier = Modifier.width(2.dp).height(24.dp).background(PaperMarioColors.BorderBrown.copy(alpha = 0.15f)))
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Text("🃏", fontSize = 24.sp)
-                            Column {
-                                Text("Comodines", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = PaperMarioColors.BorderBrown.copy(alpha = 0.5f))
-                                Text("$wildcardsCount", fontSize = 16.sp, fontWeight = FontWeight.Black, color = PaperMarioColors.BorderBrown)
-                            }
-                        }
-                    }
-
-                    // Chapter List Index
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFFFFDF9), shape = RoundedCornerShape(14.dp))
-                            .border(2.5.dp, PaperMarioColors.BorderBrown, shape = RoundedCornerShape(14.dp))
-                            .padding(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "📖 INDICE DE CUENTOS",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Black,
-                            color = PaperMarioColors.BorderBrown,
-                            modifier = Modifier.padding(bottom = 4.dp)
-                        )
-
-                        chapters.forEach { chapter ->
-                            val isUnlocked = chapter.unlocked
-                            val isCompleted = chapter.completed
-
-                            val bg = if (isUnlocked) {
-                                when (chapter.id) {
-                                    "ninja" -> Color(0xFFEBF5FB)
-                                    "fantasma" -> Color(0xFFF5EEF8)
-                                    "vaquero" -> Color(0xFFFEF9E7)
-                                    "rey" -> Color(0xFFEAFAF1)
-                                    "robot" -> Color(0xFFFDF2E9)
-                                    else -> Color.White
-                                }
-                            } else {
-                                Color(0xFFEBE5DB)
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .shadow(if (isUnlocked) 2.dp else 0.dp, RoundedCornerShape(12.dp))
-                                    .background(bg, RoundedCornerShape(12.dp))
-                                    .border(2.dp, if (isUnlocked) PaperMarioColors.BorderBrown else Color(0x33332011), RoundedCornerShape(12.dp))
-                                    .padding(8.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(10.dp)
-                            ) {
-                                StickerCharacter(
-                                    emoji = if (isUnlocked) chapter.emoji else "🔒",
-                                    size = 40.dp,
-                                    hasPedestal = isUnlocked
-                                )
-
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = chapter.title,
-                                        fontSize = 13.sp,
-                                        fontWeight = FontWeight.Black,
-                                        color = if (isUnlocked) PaperMarioColors.BorderBrown else PaperMarioColors.BorderBrown.copy(alpha = 0.5f)
-                                    )
-                                    if (isUnlocked) {
-                                        Row(verticalAlignment = Alignment.CenterVertically) {
-                                            repeat(5) { idx ->
-                                                Text(
-                                                    text = if (idx < chapter.starsEarned) "⭐" else "☆",
-                                                    fontSize = 10.sp,
-                                                    color = if (idx < chapter.starsEarned) Color(0xFFFFC107) else Color(0x33332011)
-                                                )
-                                            }
-                                            if (isCompleted) {
-                                                Text(" • ✅ ¡Leído!", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF27AE60))
-                                            }
-                                        }
-                                    } else {
-                                        Text("¡Completa el cuento anterior!", fontSize = 9.sp, color = Color(0xFF7F8C8D))
-                                    }
-                                }
-
-                                if (isUnlocked) {
-                                    ChunkyGameButton(
-                                        onClick = {
-                                            viewModel.selectPreviewChapter(chapter.id)
-                                            viewModel.navigateTo(Screen.StoryPreview)
-                                        },
-                                        containerColor = Color(0xFF4CAF50),
-                                        bevelColor = Color(0xFF2E7D32),
-                                        modifier = Modifier.width(76.dp)
-                                    ) {
-                                        Text("JUGAR ▶", fontSize = 8.sp, fontWeight = FontWeight.Black, color = Color.White)
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Action buttons (Shop and Reset) at bottom
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        ChunkyGameButton(
-                            onClick = { viewModel.navigateTo(Screen.Characters) },
-                            containerColor = Color(0xFFD32F2F),
-                            bevelColor = Color(0xFF991B1B),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("TIENDA DE COMUNIDAD 🎪", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.White)
-                        }
-                    }
-                }
-            }
-        }
-
-        // Floating Top Corner Buttons (Music & Reset)
-        Row(
+        PaperBanner(
+            text = "CRÉDITOS",
+            backgroundColor = PaperMarioColors.StageRed,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        
+        Box(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(top = 16.dp, start = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .weight(1f)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
         ) {
-            // Background Music Toggle
-            val isMusicOn by com.example.utils.SoundManager.isBgmEnabled
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { 
-                        com.example.utils.SoundManager.playPop()
-                        com.example.utils.SoundManager.toggleBgm()
-                    }
-            ) {
-                CardboardContainer(
-                    backgroundColor = PaperMarioColors.PaperWhite,
-                    cornerRadius = 10.dp,
-                    hasStitches = false,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(if (isMusicOn) "🎵" else "🔇", fontSize = 18.sp)
-                    }
-                }
-            }
-
-            // Reset Progress Button
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clickable { 
-                        com.example.utils.SoundManager.playPop()
-                        showResetWarning = true 
-                    }
-            ) {
-                CardboardContainer(
-                    backgroundColor = PaperMarioColors.PaperWhite,
-                    cornerRadius = 10.dp,
-                    hasStitches = false,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("🔄", fontSize = 18.sp)
-                    }
-                }
-            }
-        }
-
-        // Reset Warning Dialog Overlay
-        if (showResetWarning) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.6f))
-                    .clickable { /* Block clicks */ },
-                contentAlignment = Alignment.Center
-            ) {
-                CardboardContainer(
-                    modifier = Modifier.widthIn(max = 400.dp).padding(24.dp),
-                    backgroundColor = Color(0xFFFFF9F2),
-                    cornerRadius = 16.dp,
-                    hasStitches = true
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+            if (allCompleted) {
+                CardboardContainer(backgroundColor = PaperMarioColors.SkyBlue) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
                         Text(
-                            text = "⚠️ ADVERTENCIA",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Black,
-                            color = Color(0xFFD32F2F)
+                            text = "¡Felicidades!",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PaperMarioColors.BorderBrown,
+                            modifier = Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            text = "¿Estás seguro de que quieres reiniciar TODO tu progreso? Perderás todas tus estrellas, comodines y personajes desbloqueados. ¡Esta acción no se puede deshacer!",
-                            fontSize = 14.sp,
-                            textAlign = TextAlign.Center,
-                            color = PaperMarioColors.BorderBrown
+                            text = "Has completado todos los cuentos.",
+                            fontSize = 16.sp,
+                            color = PaperMarioColors.BorderBrown,
+                            textAlign = TextAlign.Center
                         )
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        Spacer(modifier = Modifier.height(24.dp))
+                        ChunkyGameButton(
+                            onClick = onTriggerClick,
+                            containerColor = PaperMarioColors.StageRed,
+                            bevelColor = Color(0xFF7F0000)
                         ) {
-                            ChunkyGameButton(
-                                onClick = { showResetWarning = false },
-                                containerColor = Color(0xFFBDC3C7),
-                                bevelColor = Color(0xFF7F8C8D),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("CANCELAR", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.White)
-                            }
-                            ChunkyGameButton(
-                                onClick = { 
-                                    viewModel.resetAllAppProgress()
-                                    showResetWarning = false
-                                },
-                                containerColor = Color(0xFFD32F2F),
-                                bevelColor = Color(0xFF991B1B),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("REINICIAR", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.White)
-                            }
+                            Text("VER CRÉDITOS", fontSize = 20.sp, fontWeight = FontWeight.Black, color = Color.White)
                         }
                     }
                 }
+            } else {
+                CardboardContainer(backgroundColor = Color(0xFFEBE5DB)) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(24.dp)) {
+                        Text(
+                            text = "BLOQUEADO",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PaperMarioColors.BorderBrown.copy(alpha = 0.6f),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            text = "Termina los 10 cuentos\npara ver los créditos.",
+                            fontSize = 16.sp,
+                            color = PaperMarioColors.BorderBrown.copy(alpha = 0.6f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
             }
         }
+        Spacer(modifier = Modifier.height(16.dp))
     }
 }

@@ -26,7 +26,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun CreditsScreen(viewModel: MainViewModel) {
     var stage by remember { mutableStateOf(0) } // 0: Blank, 1: Image 1, 2: Blank, 3: Image 2, 4: Done
-
     LaunchedEffect(Unit) {
         delay(500) // Initial blank screen
         stage = 1 // Show Image 1
@@ -43,7 +42,7 @@ fun CreditsScreen(viewModel: MainViewModel) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF38B6FF)),
+            .background(Color(0xFF844E37)),
         contentAlignment = Alignment.Center
     ) {
         // Image 1
@@ -81,7 +80,6 @@ fun CreditsScreen(viewModel: MainViewModel) {
             } catch (e: Exception) {
                 android.R.drawable.ic_menu_gallery
             }
-
             Image(
                 painter = painterResource(id = resId),
                 contentDescription = "Créditos 2",

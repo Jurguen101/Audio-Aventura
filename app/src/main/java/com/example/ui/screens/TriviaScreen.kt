@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -108,7 +109,10 @@ fun TriviaScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF5E6CC)) // Craft Cardboard backdrop
+            .padding(8.dp)
+            .shadow(12.dp, RoundedCornerShape(16.dp))
+            .background(Color(0xFFF5E6CC), RoundedCornerShape(16.dp)) // Craft Cardboard backdrop
+            .border(2.dp, PaperMarioColors.BorderBrown.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -123,7 +127,7 @@ fun TriviaScreen(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "🎓 DESAFÍO DE PREGUNTAS DE CARTÓN 🎓",
+                text = "DESAFÍO DE PREGUNTAS DE CARTÓN",
                 color = Color.White,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Black,
@@ -150,7 +154,7 @@ fun TriviaScreen(
                 containerColor = PaperMarioColors.PaperWhite
             ) {
                 Text(
-                    text = "🏠 SALIR",
+                    text = "SALIR",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Black,
                     color = PaperMarioColors.BorderBrown
@@ -211,7 +215,7 @@ fun TriviaScreen(
                     repeat(questions.size) { index ->
                         val isStarEarned = index < starsEarned
                         Text(
-                            text = if (isStarEarned) "⭐" else "⚫",
+                            text = if (isStarEarned) "★" else "○",
                             fontSize = 18.sp,
                             modifier = if (isStarEarned) Modifier.scale(starScale) else Modifier
                         )
@@ -418,7 +422,7 @@ fun TriviaScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "¡VERIFICAR RESPUESTA! 🚀",
+                    text = "¡VERIFICAR RESPUESTA!",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Black,
                     color = Color.White
@@ -439,7 +443,7 @@ fun TriviaScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "🎉 ¡EXCELENTE! 🎉",
+                            text = "¡EXCELENTE!",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Black,
                             color = Color(0xFF1E8449)
@@ -463,7 +467,7 @@ fun TriviaScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = if (isLastQuestion) "FINALIZAR AVENTURA 🎓🏆" else "SIGUIENTE PREGUNTA ▶",
+                        text = if (isLastQuestion) "FINALIZAR AVENTURA" else "SIGUIENTE PREGUNTA",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Black,
                         color = PaperMarioColors.BorderBrown
@@ -482,7 +486,7 @@ fun TriviaScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "❌ ¡OH, CASI LO LOGRAS! ❌",
+                            text = "¡OH, CASI LO LOGRAS!",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Black,
                             color = Color(0xFFC0392B)
@@ -534,7 +538,7 @@ fun TriviaScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = if (isLastQuestion) "CONTINUAR 🏁" else "CONTINUAR ▶",
+                            text = if (isLastQuestion) "CONTINUAR" else "CONTINUAR",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Black,
                             color = PaperMarioColors.BorderBrown

@@ -54,11 +54,18 @@ fun CharactersScreen(
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp)
+            .shadow(12.dp, RoundedCornerShape(16.dp))
+            .background(Color(0xFFE5D3B3), RoundedCornerShape(16.dp))
+            .border(2.dp, PaperMarioColors.BorderBrown.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFE5D3B3)) // Cozy cardboard kraft base color
+                .clip(RoundedCornerShape(16.dp)) // To ensure internal elements don't bleed out of the rounded corners
         ) {
             // Red Theater Canopy
         Box(
@@ -187,7 +194,7 @@ fun CharactersScreen(
                                                 color = PaperMarioColors.BorderBrown
                                             )
                                             Text(
-                                                text = if (isUnlocked) "✨ EN ÁLBUM" else "🔒 Bloqueado",
+                                                text = if (isUnlocked) "EN ÁLBUM" else "BLOQUEADO",
                                                 fontSize = 10.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = if (isUnlocked) Color(0xFF27AE60) else Color(0xFF7F8C8D)
@@ -569,7 +576,7 @@ fun CharactersScreen(
                                             color = PaperMarioColors.BorderBrown
                                         )
                                         Text(
-                                            text = if (isUnlocked) "✨ EN ÁLBUM" else "🔒 Bloqueado",
+                                            text = if (isUnlocked) "EN ÁLBUM" else "BLOQUEADO",
                                             fontSize = 9.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = if (isUnlocked) Color(0xFF27AE60) else Color(0xFF7F8C8D)

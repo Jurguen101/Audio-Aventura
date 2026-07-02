@@ -7,6 +7,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.draw.shadow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -64,7 +65,10 @@ fun StoryScreen(
     Row(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF5E6CC)) // Cozy craft paper background
+            .padding(8.dp)
+            .shadow(12.dp, RoundedCornerShape(16.dp))
+            .background(Color(0xFFF5E6CC), RoundedCornerShape(16.dp)) // Cozy craft paper background
+            .border(2.dp, PaperMarioColors.BorderBrown.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
             .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -94,11 +98,21 @@ fun StoryScreen(
                     )
                 }
 
-                PaperBanner(
-                    text = "${currentChapter.title} ${currentChapter.emoji}",
-                    backgroundColor = PaperMarioColors.BannerYellow,
-                    textColor = PaperMarioColors.BorderBrown
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    PaperBanner(
+                        text = currentChapter.title,
+                        backgroundColor = PaperMarioColors.BannerYellow,
+                        textColor = PaperMarioColors.BorderBrown
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(modifier = Modifier.size(40.dp)) {
+                        com.example.ui.components.CharacterGraphic(emoji = currentChapter.emoji)
+                    }
+                }
             }
 
             // 1. DIORAMA POP-UP PARALLAX CANVAS with custom pop-up unfolding animation
@@ -149,9 +163,26 @@ fun StoryScreen(
                     .weight(1f),
                 label = "StoryDioramaUnfold"
             ) { targetPage ->
+
+                val mainCharEmoji = when (currentChapter?.id) {
+                    "ninja" -> "🥷"
+                    "fantasma" -> "👻"
+                    "vaquero" -> "🤠"
+                    "rey" -> "👑"
+                    "robot" -> "🤖"
+                    "dragon" -> "🐉"
+                    "pirata" -> "🏴‍☠️"
+                    "astronauta" -> "🧑‍🚀"
+                    "ardilla" -> "🐿️"
+                    "mago" -> "🧙‍♂️"
+                    else -> targetPage.mainDioramaEmoji
+                }
+
                 PopUpDioramaCanvas(
-                    mainEmoji = targetPage.mainDioramaEmoji,
+                    mainEmoji = mainCharEmoji,
+
                     floatingEmojis = targetPage.floatingDioramaEmojis,
+                    storyTheme = currentChapter?.id ?: "",
                     backgroundColors = targetPage.backgroundGradientColors,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -484,7 +515,7 @@ fun StoryScreen(
 
                 val isLastPage = currentPageIndex == pages.size - 1
                 val nextButtonBg = if (isLastPage) PaperMarioColors.BannerYellow else PaperMarioColors.SkyBlue
-                val nextButtonText = if (isLastPage) "TRIVIA 🎓✨" else "SIGUIENTE ▶"
+                val nextButtonText = if (isLastPage) "TRIVIA" else "SIGUIENTE"
 
                 CardboardButton(
                     onClick = {

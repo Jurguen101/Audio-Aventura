@@ -68,48 +68,8 @@ fun StoryPreviewScreen(
     }
 
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(Color(0xFF8D5A36), Color(0xFF3B1E0A)),
-                    center = Offset(0.5f, 0.5f)
-                )
-            )
+        modifier = modifier.fillMaxSize()
     ) {
-        // Wooden desk plank texture background with cozy candle glow
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val woodColor = Color(0xFF1E0F07)
-            val width = size.width
-            val height = size.height
-            
-            // Plank lines
-            for (y in listOf(0.15f, 0.35f, 0.55f, 0.75f, 0.95f)) {
-                drawLine(
-                    color = woodColor.copy(alpha = 0.3f),
-                    start = Offset(0f, height * y),
-                    end = Offset(width, height * y),
-                    strokeWidth = 4f
-                )
-            }
-
-            // Glowing library candle ambiance on top right and left
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0xFFFFF59D).copy(alpha = 0.22f), Color.Transparent),
-                    center = Offset(width * 0.92f, height * 0.15f),
-                    radius = width * 0.3f
-                )
-            )
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(Color(0xFFFFF59D).copy(alpha = 0.15f), Color.Transparent),
-                    center = Offset(width * 0.08f, height * 0.25f),
-                    radius = width * 0.22f
-                )
-            )
-        }
-
         // Layout container
         Column(
             modifier = Modifier
@@ -423,10 +383,11 @@ fun StoryPreviewScreen(
                                                 )
                                                 
                                                 // Lock / Unlock symbol
-                                                Text(
-                                                    text = if (currentChapter.unlocked) currentChapter.emoji else "🔒",
-                                                    fontSize = 24.sp
-                                                )
+                                                Box(modifier = Modifier.size(32.dp)) {
+                                                    com.example.ui.components.CharacterGraphic(
+                                                        emoji = if (currentChapter.unlocked) currentChapter.emoji else "🔒"
+                                                    )
+                                                }
 
                                                 Text(
                                                     text = if (currentChapter.unlocked) "DESBLOQUEADO" else "BLOQUEADO",
@@ -484,7 +445,7 @@ fun StoryPreviewScreen(
                                         modifier = Modifier.fillMaxWidth(0.95f)
                                     ) {
                                         Text(
-                                            text = if (currentChapter.unlocked) "COMENZAR HISTORIA ▶" else "🔒 COMPLETAR ANTERIOR",
+                                            text = if (currentChapter.unlocked) "COMENZAR HISTORIA" else "COMPLETAR ANTERIOR",
                                             fontSize = 11.sp,
                                             fontWeight = FontWeight.Black,
                                             color = Color.White
@@ -668,10 +629,11 @@ fun StoryPreviewScreen(
                                             fontWeight = FontWeight.Black,
                                             color = Color.White
                                         )
-                                        Text(
-                                            text = if (currentChapter.unlocked) currentChapter.emoji else "🔒",
-                                            fontSize = 24.sp
-                                        )
+                                        Box(modifier = Modifier.size(32.dp)) {
+                                            com.example.ui.components.CharacterGraphic(
+                                                emoji = if (currentChapter.unlocked) currentChapter.emoji else "🔒"
+                                            )
+                                        }
                                         Text(
                                             text = if (currentChapter.unlocked) "DESBLOQUEADO" else "BLOQUEADO",
                                             fontSize = 8.sp,
@@ -727,7 +689,7 @@ fun StoryPreviewScreen(
                                 modifier = Modifier.fillMaxWidth(0.95f)
                             ) {
                                 Text(
-                                    text = if (currentChapter.unlocked) "COMENZAR HISTORIA ▶" else "🔒 COMPLETAR ANTERIOR",
+                                    text = if (currentChapter.unlocked) "COMENZAR HISTORIA" else "COMPLETAR ANTERIOR",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Black,
                                     color = Color.White

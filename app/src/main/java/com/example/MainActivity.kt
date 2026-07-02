@@ -29,6 +29,7 @@ import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.StoryPreviewScreen
 import com.example.ui.screens.StoryScreen
 import com.example.ui.screens.TriviaScreen
+import com.example.ui.screens.FinalCreditsScreen
 import com.example.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
         
         // Init SoundManager
         val ctx = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            createAttributionContext("my_tag")
+            this
         } else {
             this
         }
@@ -65,37 +66,40 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
-                        // Beautiful clean animations when switching between the pop-up book pages
-                        AnimatedContent(
-                            targetState = currentScreen,
-                            transitionSpec = {
-                                // Pop-up book style transition: Scale in with a bounce, fade out scaling up
-                                (scaleIn(
-                                    initialScale = 0.7f,
-                                    animationSpec = androidx.compose.animation.core.spring(
-                                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
-                                        stiffness = androidx.compose.animation.core.Spring.StiffnessLow
-                                    )
-                                ) + fadeIn(
-                                    animationSpec = androidx.compose.animation.core.tween(400)
-                                )) togetherWith (
-                                    scaleOut(
-                                        targetScale = 1.2f,
+                        com.example.ui.components.DioramaAppWrapper {
+                            // Beautiful clean animations when switching between the pop-up book pages
+                            AnimatedContent(
+                                targetState = currentScreen,
+                                transitionSpec = {
+                                    // Pop-up book style transition: Scale in with a bounce, fade out scaling up
+                                    (scaleIn(
+                                        initialScale = 0.7f,
+                                        animationSpec = androidx.compose.animation.core.spring(
+                                            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                                            stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+                                        )
+                                    ) + fadeIn(
                                         animationSpec = androidx.compose.animation.core.tween(400)
-                                    ) + fadeOut(
-                                        animationSpec = androidx.compose.animation.core.tween(400)
+                                    )) togetherWith (
+                                        scaleOut(
+                                            targetScale = 1.2f,
+                                            animationSpec = androidx.compose.animation.core.tween(400)
+                                        ) + fadeOut(
+                                            animationSpec = androidx.compose.animation.core.tween(400)
+                                        )
                                     )
-                                )
-                            },
-                            label = "BookPageTurnTransition"
-                        ) { screen ->
-                            when (screen) {
-                                Screen.Credits -> com.example.ui.screens.CreditsScreen(viewModel = viewModel)
-                                Screen.Home -> HomeScreen(viewModel = viewModel)
-                                Screen.StoryPreview -> StoryPreviewScreen(viewModel = viewModel)
-                                Screen.Story -> StoryScreen(viewModel = viewModel)
-                                Screen.Trivia -> TriviaScreen(viewModel = viewModel)
-                                Screen.Characters -> CharactersScreen(viewModel = viewModel)
+                                },
+                                label = "BookPageTurnTransition"
+                            ) { screen ->
+                                when (screen) {
+                                    Screen.Credits -> com.example.ui.screens.CreditsScreen(viewModel = viewModel)
+                                    Screen.FinalCredits -> FinalCreditsScreen(viewModel = viewModel)
+                                    Screen.Home -> HomeScreen(viewModel = viewModel)
+                                    Screen.StoryPreview -> StoryPreviewScreen(viewModel = viewModel)
+                                    Screen.Story -> StoryScreen(viewModel = viewModel)
+                                    Screen.Trivia -> TriviaScreen(viewModel = viewModel)
+                                    Screen.Characters -> CharactersScreen(viewModel = viewModel)
+                                }
                             }
                         }
                     }

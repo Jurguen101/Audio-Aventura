@@ -13,6 +13,7 @@ import java.util.Locale
 
 enum class Screen {
     Credits,
+    FinalCredits,
     Home,
     StoryPreview,
     Story,
@@ -41,8 +42,14 @@ class MainViewModel(
 
     fun navigateTo(screen: Screen) {
         _currentScreen.value = screen
-        if (screen == Screen.Home) {
+        if (screen == Screen.Home || screen == Screen.Credits || screen == Screen.FinalCredits || screen == Screen.Characters) {
             stopSpeaking()
+            com.example.utils.SoundManager.playBgm()
+        } else if (screen == Screen.Story) {
+            val chapterId = _activeChapterId.value
+            if (chapterId != null) {
+                com.example.utils.SoundManager.playChapterBgm(chapterId)
+            }
         }
     }
 
@@ -102,7 +109,7 @@ class MainViewModel(
         }
         try {
             val ctx = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-                application.createAttributionContext("my_tag")
+                application
             } else {
                 application
             }
@@ -304,10 +311,14 @@ class MainViewModel(
         } else {
             val chapterId = _activeChapterId.value ?: return
             val starsEarned = _starsEarnedInCurrentAdventure.value
+            val previouslyCompletedCount = allChapters.value.count { it.completed }
+            val chapterWasNotCompleted = allChapters.value.find { it.id == chapterId }?.completed == false
+            
             viewModelScope.launch {
                 repository.addStars(starsEarned)
                 repository.completeChapter(chapterId, starsEarned)
             }
+            
             navigateTo(Screen.Home)
         }
     }

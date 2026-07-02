@@ -169,10 +169,35 @@ fun DioramaHeader(
  * Runs beautiful light breathing parallax transitions.
  * Uses 0% memory, zero bitmap allocations. Perfect for low-end device offline performance.
  */
+data class DioramaThemeColors(
+    val groundColor: Color,
+    val spotlightColor: Color,
+    val curtainColor: Color,
+    val headerTitle: String
+)
+
+fun getDioramaTheme(storyTheme: String): DioramaThemeColors {
+    return when (storyTheme) {
+        "ninja" -> DioramaThemeColors(Color(0xFF8D6E63), Color(0xFFE57373).copy(alpha = 0.15f), Color(0xFFB71C1C), "DOJO SECRETO") // Ninja
+        "fantasma" -> DioramaThemeColors(Color(0xFF455A64), Color(0xFFCE93D8).copy(alpha = 0.15f), Color(0xFF4A148C), "MANSIÓN EMBRUJADA") // Fantasma
+        "vaquero" -> DioramaThemeColors(Color(0xFFD7CCC8), Color(0xFFFFCC80).copy(alpha = 0.15f), Color(0xFFE65100), "LEJANO OESTE") // Vaquero
+        "rey" -> DioramaThemeColors(Color(0xFFB71C1C), Color(0xFFFFF59D).copy(alpha = 0.2f), Color(0xFF1A237E), "SALÓN DEL TRONO") // Rey
+        "robot" -> DioramaThemeColors(Color(0xFF90A4AE), Color(0xFF80DEEA).copy(alpha = 0.2f), Color(0xFF37474F), "LABORATORIO") // Robot
+        "dragon" -> DioramaThemeColors(Color(0xFF4E342E), Color(0xFFFFAB91).copy(alpha = 0.15f), Color(0xFFBF360C), "CUEVA DEL DRAGÓN") // Dragón
+        "pirata" -> DioramaThemeColors(Color(0xFF795548), Color(0xFF90CAF9).copy(alpha = 0.15f), Color(0xFF006064), "BARCO PIRATA") // Pirata
+        "astronauta" -> DioramaThemeColors(Color(0xFFCFD8DC), Color(0xFFB39DDB).copy(alpha = 0.15f), Color(0xFF283593), "LUNA EXTERIOR") // Astronauta
+        "ardilla" -> DioramaThemeColors(Color(0xFFA5D6A7), Color(0xFFFFF59D).copy(alpha = 0.15f), Color(0xFF2E7D32), "BOSQUE MÁGICO") // Ardilla
+        "mago" -> DioramaThemeColors(Color(0xFF512DA8), Color(0xFFCE93D8).copy(alpha = 0.2f), Color(0xFF311B92), "TORRE DEL MAGO") // Mago
+        else -> DioramaThemeColors(Color(0xFFC0A473).copy(alpha = 0.8f), Color(0xFFFFF59D).copy(alpha = 0.15f), PaperMarioColors.StageRed, "ESCENARIO DE AVENTURAS")
+    }
+}
+
 @Composable
 fun PopUpDioramaCanvas(
     mainEmoji: String,
     floatingEmojis: List<String>,
+    storyTheme: String = "",
+
     backgroundColors: List<Long>,
     modifier: Modifier = Modifier
 ) {
@@ -199,6 +224,7 @@ fun PopUpDioramaCanvas(
         label = "Scale"
     )
 
+
     val rotationAngle by infiniteTransition.animateFloat(
         initialValue = -3f,
         targetValue = 3f,
@@ -208,6 +234,17 @@ fun PopUpDioramaCanvas(
         ),
         label = "Rotate"
     )
+
+    val walkProgress by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(6000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "Walk"
+    )
+
 
     val brush = remember(backgroundColors) {
         Brush.verticalGradient(
@@ -255,14 +292,37 @@ fun PopUpDioramaCanvas(
                     2 -> Alignment.BottomStart
                     else -> Alignment.BottomEnd
                 }
-                Text(
-                    text = emoji,
-                    fontSize = 32.sp,
+                Box(
                     modifier = Modifier
                         .align(alignment)
                         .padding(16.dp)
+                        .size(32.dp)
                         .rotate(rotationAngle * (index + 1) * 0.5f)
-                )
+                ) {
+                    // Draw geometric shape as background prop instead of emoji
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        val shapeType = index % 3
+                        val color = when (index % 4) {
+                            0 -> Color(0xFFFFD700) // Gold
+                            1 -> Color(0xFFFF5722) // Deep Orange
+                            2 -> Color(0xFF4CAF50) // Green
+                            else -> Color(0xFF03A9F4) // Blue
+                        }
+                        when (shapeType) {
+                            0 -> drawCircle(color = color, radius = size.width / 2f)
+                            1 -> drawRect(color = color, size = androidx.compose.ui.geometry.Size(size.width, size.height))
+                            2 -> {
+                                val path = androidx.compose.ui.graphics.Path().apply {
+                                    moveTo(size.width / 2f, 0f)
+                                    lineTo(size.width, size.height)
+                                    lineTo(0f, size.height)
+                                    close()
+                                }
+                                drawPath(path, color = color)
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -277,7 +337,7 @@ fun PopUpDioramaCanvas(
                     scaleX = scaleFactor
                 }
                 .background(
-                    color = Color(0xFFC0A473).copy(alpha = 0.8f), // Real cardboard brown ground layer
+                    color = getDioramaTheme(storyTheme).groundColor,
                     shape = RoundedCornerShape(100.dp)
                 )
                 .border(2.dp, PaperMarioColors.BorderBrown, shape = RoundedCornerShape(100.dp))
@@ -288,10 +348,19 @@ fun PopUpDioramaCanvas(
             modifier = Modifier
                 .align(Alignment.Center)
                 .graphicsLayer {
-                    translationY = verticalOffset
-                    scaleX = scaleFactor
+                    val walkX = if (walkProgress < 0.5f) {
+                        -80f + (walkProgress * 2f) * 160f
+                    } else {
+                        80f - ((walkProgress - 0.5f) * 2f) * 160f
+                    }
+                    val directionScale = if (walkProgress < 0.5f) 1f else -1f
+                    val bounce = kotlin.math.abs(kotlin.math.sin(walkProgress * kotlin.math.PI * 16).toFloat()) * -30f
+                    
+                    translationX = walkX
+                    translationY = verticalOffset + bounce
+                    scaleX = scaleFactor * directionScale
                     scaleY = scaleFactor
-                    rotationZ = rotationAngle
+                    rotationZ = rotationAngle + (bounce * 0.1f)
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -313,7 +382,7 @@ fun PopUpDioramaCanvas(
             }
             drawPath(
                 path = pathLeft,
-                color = Color(0xFFFFF59D).copy(alpha = 0.15f) // Warm golden theatrical glow
+                color = getDioramaTheme(storyTheme).spotlightColor
             )
 
             // Right spotlight cone
@@ -325,7 +394,7 @@ fun PopUpDioramaCanvas(
             }
             drawPath(
                 path = pathRight,
-                color = Color(0xFFFFF59D).copy(alpha = 0.15f)
+                color = getDioramaTheme(storyTheme).spotlightColor
             )
         }
 
@@ -336,7 +405,7 @@ fun PopUpDioramaCanvas(
                 .fillMaxHeight()
                 .width(18.dp)
                 .align(Alignment.CenterStart)
-                .background(PaperMarioColors.StageRed)
+                .background(getDioramaTheme(storyTheme).curtainColor)
                 .border(2.dp, PaperMarioColors.BorderBrown)
         )
         // Right side drape
@@ -345,7 +414,7 @@ fun PopUpDioramaCanvas(
                 .fillMaxHeight()
                 .width(18.dp)
                 .align(Alignment.CenterEnd)
-                .background(PaperMarioColors.StageRed)
+                .background(getDioramaTheme(storyTheme).curtainColor)
                 .border(2.dp, PaperMarioColors.BorderBrown)
         )
         // Top Valance curtain
@@ -354,12 +423,12 @@ fun PopUpDioramaCanvas(
                 .fillMaxWidth()
                 .height(24.dp)
                 .align(Alignment.TopCenter)
-                .background(PaperMarioColors.StageRed)
+                .background(getDioramaTheme(storyTheme).curtainColor)
                 .border(2.dp, PaperMarioColors.BorderBrown),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "🎭 ESCENARIO DE AVENTURAS 🎭",
+                text = getDioramaTheme(storyTheme).headerTitle,
                 color = Color.White,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Black,

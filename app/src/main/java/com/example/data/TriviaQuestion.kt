@@ -5,381 +5,151 @@ data class TriviaQuestion(
     val questionText: String,
     val options: List<String>,
     val correctAnswer: String,
-    val difficultyLabel: String // "Fácil", "Medio-Fácil", "Medio", "Difícil", "Muy Difícil"
+    val difficultyLabel: String
 )
 
 object TriviaProvider {
     fun getQuestionsForChapter(chapterId: String): List<TriviaQuestion> {
         return when (chapterId) {
             "ninja" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Quién es el pequeño ninja impaciente del cuento?",
-                    options = listOf("A) El maestro Hayato", "B) El ninja Ken", "C) El gorrión alegre"),
-                    correctAnswer = "B) El ninja Ken",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Qué accidente le ocurrió a Ken por querer cruzar la cuerda floja sin practicar?",
-                    options = listOf("A) Cayó sobre un montón de hojas secas", "B) Se le voló el sombrero", "C) Se mojó con un balde de agua"),
-                    correctAnswer = "A) Cayó sobre un montón de hojas secas",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Qué ocurrió cuando Ken intentó lanzar las estrellas de entrenamiento?",
-                    options = listOf("A) Le dio al centro del blanco", "B) Rompió una cuerda y le cayó un balde de agua en la cabeza", "C) Perdió las estrellas en el río"),
-                    correctAnswer = "B) Rompió una cuerda y le cayó un balde de agua en la cabeza",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿De quién aprendió Ken la importancia de ir ramita por ramita?",
-                    options = listOf("A) De un pequeño gorrión que hacía su nido", "B) Del maestro Hayato", "C) De un castor en el río"),
-                    correctAnswer = "A) De un pequeño gorrión que hacía su nido",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Qué valiosa lección aprendió Ken al final del entrenamiento?",
-                    options = listOf("A) Que ganar requiere ser el más veloz de todos", "B) Que la paciencia, la práctica y el esfuerzo diario permiten lograr grandes metas", "C) Que el equilibrio no es importante"),
-                    correctAnswer = "B) Que la paciencia, la práctica y el esfuerzo diario permiten lograr grandes metas",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(1, "¿Por qué Ken pensaba que los ejercicios básicos no eran importantes?", listOf("Porque quería aprender técnicas difíciles de inmediato", "Porque el maestro no se lo exigía", "Porque ya los había practicado demasiado"), "Porque quería aprender técnicas difíciles de inmediato", "Inferencial ⭐"),
+                TriviaQuestion(2, "¿Qué nos demuestra la caída de Ken sobre la cuerda acerca de su forma de actuar?", listOf("Que actuar sin preparación lleva al fracaso", "Que la cuerda estaba rota", "Que el viento soplaba muy fuerte"), "Que actuar sin preparación lleva al fracaso", "Inferencial ⭐"),
+                TriviaQuestion(3, "¿Por qué el maestro dijo que Ken había querido \"empezar por el final\"?", listOf("Porque intentó dominar lo avanzado sin dominar lo básico", "Porque llegó tarde al entrenamiento", "Porque quería terminar rápido para ir a jugar"), "Porque intentó dominar lo avanzado sin dominar lo básico", "Inferencial ⭐"),
+                TriviaQuestion(4, "¿Qué pudo haber sentido Ken cuando los demás estudiantes lo vieron empapado de agua?", listOf("Mucha vergüenza y frustración", "Alegría porque hacía calor", "Enojo con los demás estudiantes"), "Mucha vergüenza y frustración", "Inferencial ⭐"),
+                TriviaQuestion(5, "¿Por qué el gorrión fue importante para que Ken cambiara de actitud?", listOf("Le enseñó que el trabajo se hace paso a paso", "Porque cantaba canciones hermosas", "Porque le trajo una rama de la suerte"), "Le enseñó que el trabajo se hace paso a paso", "Inferencial ⭐"),
+                TriviaQuestion(6, "¿Qué relación existe entre construir un nido y aprender a ser un buen ninja?", listOf("Ambas requieren paciencia, constancia y avanzar poco a poco", "Ambas se hacen en los árboles altos", "Ninguna de las dos necesita esfuerzo"), "Ambas requieren paciencia, constancia y avanzar poco a poco", "Inferencial ⭐"),
+                TriviaQuestion(7, "¿Cómo habría terminado la historia si Ken hubiera seguido ignorando los consejos del maestro?", listOf("Nunca habría aprendido y seguiría fallando", "Hubiera aprendido a su propio ritmo", "Se habría convertido en maestro de inmediato"), "Nunca habría aprendido y seguiría fallando", "Inferencial ⭐"),
+                TriviaQuestion(8, "¿Por qué el maestro esperó a que Ken aprendiera por sí mismo en lugar de regañarlo constantemente?", listOf("Porque la propia experiencia es la mejor maestra", "Porque no le importaba lo que hiciera Ken", "Porque estaba muy ocupado con otros estudiantes"), "Porque la propia experiencia es la mejor maestra", "Inferencial ⭐"),
+                TriviaQuestion(9, "¿Qué cambios ocurrieron en Ken además de mejorar sus habilidades como ninja?", listOf("Se volvió más paciente, humilde y perseverante", "Se hizo amigo del gorrión", "Se mudó a otra aldea"), "Se volvió más paciente, humilde y perseverante", "Inferencial ⭐"),
+                TriviaQuestion(10, "¿En qué situaciones de la vida escolar un estudiante puede parecerse a Ken al principio del cuento?", listOf("Al querer resolver problemas difíciles sin estudiar la lección", "Al hacer toda la tarea a tiempo", "Al ayudar a sus compañeros en clase"), "Al querer resolver problemas difíciles sin estudiar la lección", "Inferencial ⭐"),
+                TriviaQuestion(11, "¿Crees que el éxito de Ken se debió más a su talento o a su perseverancia?", listOf("A su perseverancia y cambio de actitud", "A su talento natural para ser ninja", "A la ayuda de los demás estudiantes"), "A su perseverancia y cambio de actitud", "Inferencial ⭐"),
+                TriviaQuestion(12, "¿Qué enseñanza del cuento podrías aplicar para aprender una nueva habilidad?", listOf("Tener paciencia y practicar diariamente", "Hacerlo rápido para no aburrirse", "Dejar de intentarlo si no sale bien a la primera"), "Tener paciencia y practicar diariamente", "Inferencial ⭐")
             )
             "fantasma" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Por qué Gaspar el fantasmita prefería quedarse escondido en la torre?",
-                    options = listOf("A) Porque no le gustaba el frío de la noche", "B) Porque tenía miedo de que se burlaran de él por no dar miedo", "C) Porque prefería jugar en silencio"),
-                    correctAnswer = "B) Porque tenía miedo de que se burlaran de él por no dar miedo",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Quién era el mejor amigo de Gaspar que se posaba en el tejado?",
-                    options = listOf("A) El viejo búho Bruno", "B) Un murciélago veloz", "C) Un gatito gris"),
-                    correctAnswer = "A) El viejo búho Bruno",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Qué descubrió Gaspar sobre la niña Sofía cuando llegó a la escalera oscura?",
-                    options = listOf("A) Que Sofía no le temía a nada", "B) Que Sofía también tenía miedo y abrazó su linterna", "C) Que Sofía andaba buscando fantasmas"),
-                    correctAnswer = "B) Que Sofía también tenía miedo y abrazó su linterna",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Qué frase valiosa le dijo el búho Bruno a Gaspar sobre el miedo?",
-                    options = listOf("A) Que los fantasmas nunca deben sentir temor", "B) Que todos sienten miedo, pero lo importante es no dejar que el miedo decida por nosotros", "C) Que es mejor quedarse escondido para siempre"),
-                    correctAnswer = "B) Que todos sienten miedo, pero lo importante es no dejar que el miedo decida por nosotros",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Cuál es la moraleja que nos enseña la tierna historia de Gaspar?",
-                    options = listOf("A) Que ser valiente significa no tener miedo jamás", "B) Que ser valiente no es la ausencia de miedo, sino enfrentarlo con confianza y ayuda", "C) Que los castillos antiguos son aburridos"),
-                    correctAnswer = "B) Que ser valiente no es la ausencia de miedo, sino enfrentarlo con confianza y ayuda",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(13, "¿Por qué Gaspar evitaba salir con los otros fantasmas si nadie lo obligaba a quedarse escondido?", listOf("Por miedo a hacer el ridículo y que no lo quisieran", "Porque le gustaba más estar solo en su torre", "Porque no sabía volar bien"), "Por miedo a hacer el ridículo y que no lo quisieran", "Inferencial ⭐"),
+                TriviaQuestion(14, "¿Qué nos permite entender la conversación entre Gaspar y el búho sobre la forma de pensar del pequeño fantasma?", listOf("Que estaba lleno de inseguridades y no creía en sí mismo", "Que era muy perezoso para salir", "Que no le gustaba asustar a los niños"), "Que estaba lleno de inseguridades y no creía en sí mismo", "Inferencial ⭐"),
+                TriviaQuestion(15, "¿Por qué Sofía decidió seguir hablando con Gaspar en lugar de salir corriendo?", listOf("Porque se dio cuenta de que él también estaba asustado", "Porque ya había visto muchos fantasmas antes", "Porque quería pedirle un favor"), "Porque se dio cuenta de que él también estaba asustado", "Inferencial ⭐"),
+                TriviaQuestion(16, "¿Qué tienen en común Gaspar y Sofía, aunque uno sea un fantasma y la otra una niña?", listOf("Ambos sentían miedo en ciertos momentos", "A ambos les gustaba asustar a los demás", "Ambos vivían en el mismo cuarto del castillo"), "Ambos sentían miedo en ciertos momentos", "Inferencial ⭐"),
+                TriviaQuestion(17, "¿Cómo influyó la amistad entre ambos para que cambiaran su manera de enfrentar el miedo?", listOf("Se dieron valor y confianza mutuamente para avanzar", "Decidieron esconderse juntos", "Prometieron no salir nunca de noche"), "Se dieron valor y confianza mutuamente para avanzar", "Inferencial ⭐"),
+                TriviaQuestion(18, "¿Qué habría ocurrido si Gaspar nunca hubiera salido de su escondite para hablar con Sofía?", listOf("Habría seguido solo, triste y con miedo", "Sofía se habría asustado de todos modos", "El búho se habría enojado con él"), "Habría seguido solo, triste y con miedo", "Inferencial ⭐"),
+                TriviaQuestion(19, "¿Por qué el lugar más hermoso del castillo solo pudo ser descubierto cuando ambos vencieron su temor?", listOf("Porque el miedo les impedía explorar cosas nuevas", "Porque estaba muy lejos y cansaba mucho subir", "Porque la puerta estaba cerrada con llave"), "Porque el miedo les impedía explorar cosas nuevas", "Inferencial ⭐"),
+                TriviaQuestion(20, "¿Qué enseñanza intentaba transmitir el búho cuando dijo que no debemos dejar que el miedo decida por nosotros?", listOf("Que el coraje es actuar a pesar de tener miedo", "Que no debemos tener miedo nunca", "Que los fantasmas son más valientes que las niñas"), "Que el coraje es actuar a pesar de tener miedo", "Inferencial ⭐"),
+                TriviaQuestion(21, "¿Por qué los demás fantasmas comenzaron a admirar a Gaspar al final del cuento?", listOf("Porque siempre encontraba la manera de animar y dar valor a los demás", "Porque aprendió a asustar mejor que todos", "Porque se hizo amigo de una niña humana"), "Porque siempre encontraba la manera de animar y dar valor a los demás", "Inferencial ⭐"),
+                TriviaQuestion(22, "¿En qué situaciones de la escuela o del hogar una persona puede sentirse como Gaspar?", listOf("Cuando tiene miedo de participar por temor a equivocarse", "Cuando está feliz de hacer la tarea", "Cuando quiere asustar a sus amigos jugando"), "Cuando tiene miedo de participar por temor a equivocarse", "Inferencial ⭐"),
+                TriviaQuestion(23, "¿Crees que pedir ayuda cuando sentimos miedo es una muestra de debilidad o de valentía?", listOf("Es valentía, porque demuestra que confiamos en otros para superar el temor", "Es debilidad, porque significa que no podemos solos", "Es malo porque molesta a los demás"), "Es valentía, porque demuestra que confiamos en otros para superar el temor", "Inferencial ⭐"),
+                TriviaQuestion(24, "¿Qué acción concreta podrías realizar la próxima vez que sientas miedo de intentar algo nuevo?", listOf("Dar el primer paso y buscar el apoyo de un amigo", "Esconderme hasta que el miedo desaparezca solo", "Dejar de intentarlo para no fallar"), "Dar el primer paso y buscar el apoyo de un amigo", "Inferencial ⭐")
             )
             "vaquero" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Qué problema de actitud tenía el joven vaquero Tomás?",
-                    options = listOf("A) Siempre llegaba tarde a todas partes", "B) No le gustaba compartir sus pertenencias", "C) Tenía miedo de montar a caballo"),
-                    correctAnswer = "B) No le gustaba compartir sus pertenencias",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Cómo se llamaba el fiel caballo de Tomás?",
-                    options = listOf("A) Rayo", "B) Relámpago", "C) Trueno"),
-                    correctAnswer = "B) Relámpago",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Qué le sucedió a Tomás durante su viaje por la llanura?",
-                    options = listOf("A) Perdió su sombrero de ala ancha", "B) Una fuerte tormenta de arena lo desorientó y se perdió", "C) Su caballo escapó al anochecer"),
-                    correctAnswer = "B) Una fuerte tormenta de arena lo desorientó y se perdió",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Quiénes ayudaron a Tomás compartiendo comida y agua en la fogata?",
-                    options = listOf("A) Otros vaqueros del pueblo", "B) La anciana y el niño a quienes él les había negado agua por la mañana", "C) Unos amigables guardabosques"),
-                    correctAnswer = "B) La anciana y el niño a quienes él les había negado agua por la mañana",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Qué gran lección aprendió Tomás sobre el valor de compartir?",
-                    options = listOf("A) Que compartir con los demás fortalece la amistad, genera confianza y nos ayuda en la dificultad", "B) Que es mejor viajar con dos cantimploras y no hablar con nadie", "C) Que el desierto siempre es un lugar peligroso para un vaquero"),
-                    correctAnswer = "A) Que compartir con los demás fortalece la amistad, genera confianza y nos ayuda en la dificultad",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(25, "¿Por qué Tomás pensaba que compartir podía perjudicarlo?", listOf("Creía que si compartía se quedaría sin suficientes provisiones para él", "Pensaba que los demás eran perezosos", "Quería vender su agua más tarde"), "Creía que si compartía se quedaría sin suficientes provisiones para él", "Inferencial ⭐"),
+                TriviaQuestion(26, "¿Qué nos indica la actitud de Relámpago cada vez que Tomás se negaba a ayudar a alguien?", listOf("Que el caballo sabía que la actitud de Tomás era incorrecta", "Que el caballo también quería beber agua", "Que Relámpago estaba cansado de caminar"), "Que el caballo sabía que la actitud de Tomás era incorrecta", "Inferencial ⭐"),
+                TriviaQuestion(27, "¿Por qué la tormenta fue un momento importante para que Tomás cambiara su forma de pensar?", listOf("Porque al perderse se dio cuenta de que él también necesitaba ayuda", "Porque la lluvia llenó su cantimplora de nuevo", "Porque se asustó mucho con los truenos"), "Porque al perderse se dio cuenta de que él también necesitaba ayuda", "Inferencial ⭐"),
+                TriviaQuestion(28, "¿Qué habrían sentido la anciana y el niño cuando Tomás les negó el agua al principio?", listOf("Decepción y tristeza por su falta de empatía", "Alegría de no tener que deberle un favor", "Enojo intenso y ganas de pelear"), "Decepción y tristeza por su falta de empatía", "Inferencial ⭐"),
+                TriviaQuestion(29, "¿Por qué decidieron ayudar a Tomás, aunque él no los había ayudado antes?", listOf("Porque ayudar a los demás siempre vale la pena y enseña con el ejemplo", "Porque querían pedirle dinero a cambio", "Porque no se acordaban de que él les negó el agua"), "Porque ayudar a los demás siempre vale la pena y enseña con el ejemplo", "Inferencial ⭐"),
+                TriviaQuestion(30, "¿Qué quiso enseñar la anciana cuando dijo que ayudar vale la pena incluso si alguien todavía está aprendiendo?", listOf("Que todos merecen compasión y una segunda oportunidad para mejorar", "Que Tomás era muy joven y no sabía nada", "Que ella era la persona más lista del desierto"), "Que todos merecen compasión y una segunda oportunidad para mejorar", "Inferencial ⭐"),
+                TriviaQuestion(31, "¿Cómo habría terminado la historia si la anciana y el niño hubieran actuado igual que Tomás?", listOf("Tomás se habría quedado solo, perdido y con sed en la llanura", "Tomás habría encontrado agua por su cuenta fácilmente", "Habrían peleado por la poca agua que quedaba"), "Tomás se habría quedado solo, perdido y con sed en la llanura", "Inferencial ⭐"),
+                TriviaQuestion(32, "¿Qué cambios ocurrieron en Tomás además de comenzar a compartir agua?", listOf("Se volvió solidario y empezó a ayudar en todo lo que podía", "Empezó a cobrar por el agua que compartía", "Se mudó de pueblo para no ver a nadie"), "Se volvió solidario y empezó a ayudar en todo lo que podía", "Inferencial ⭐"),
+                TriviaQuestion(33, "¿Por qué comprar una cantimplora más grande representa un cambio en la forma de pensar del protagonista?", listOf("Porque ahora planeaba llevar más agua para poder compartirla con los demás", "Porque tenía mucha más sed que antes", "Porque quería presumir su nueva cantimplora"), "Porque ahora planeaba llevar más agua para poder compartirla con los demás", "Inferencial ⭐"),
+                TriviaQuestion(34, "¿En qué situaciones de la escuela compartir puede beneficiar a todos los compañeros?", listOf("Al prestar útiles escolares a quien los olvidó o explicar una tarea", "Al esconder los juguetes para usarlos después", "Al no compartir la merienda"), "Al prestar útiles escolares a quien los olvidó o explicar una tarea", "Inferencial ⭐"),
+                TriviaQuestion(35, "¿Crees que Tomás cambió por obligación o porque comprendió el valor de ayudar?", listOf("Porque comprendió el verdadero valor y la importancia de la ayuda mutua", "Por obligación, porque la anciana se lo exigió", "Porque quería ser famoso en su pueblo"), "Porque comprendió el verdadero valor y la importancia de la ayuda mutua", "Inferencial ⭐"),
+                TriviaQuestion(36, "¿Qué enseñanza del cuento podrías aplicar cuando alguien necesita tu ayuda?", listOf("Colaborar de corazón sin esperar algo a cambio", "Ayudar solo si me dan una recompensa", "Ignorar el problema porque no es mío"), "Colaborar de corazón sin esperar algo a cambio", "Inferencial ⭐")
             )
             "rey" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Qué defecto inicial tenía el joven rey Adrián al gobernar?",
-                    options = listOf("A) No le interesaba el bienestar de su reino", "B) Pensaba que siempre tenía la respuesta correcta y no escuchaba a nadie", "C) No sabía leer mapas reales"),
-                    correctAnswer = "B) Pensaba que siempre tenía la respuesta correcta y no escuchaba a nadie",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Qué gran problema afectó a los cultivos del reino?",
-                    options = listOf("A) Una plaga de langostas de papel", "B) El gran estanque de agua se secó", "C) Una tormenta de granizo"),
-                    correctAnswer = "B) El gran estanque de agua se secó",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Por qué falló el enorme canal que el rey mandó construir?",
-                    options = listOf("A) Porque el canal estaba mal cavado", "B) Porque el problema real era una rama caída que bloqueaba el paso del agua", "C) Porque los campesinos se negaron a trabajar"),
-                    correctAnswer = "B) Porque el problema real era una rama caída que bloqueaba el paso del agua",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Quién había visto la rama bloqueando el paso días atrás?",
-                    options = listOf("A) La consejera doña Elvira", "B) Una niña pequeña llamada Clara", "C) Un comerciante de la plaza"),
-                    correctAnswer = "B) Una niña pequeña llamada Clara",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Qué hermosa iniciativa instauró el rey para escuchar a todos?",
-                    options = listOf("A) La 'Hora de las Buenas Ideas' para recibir propuestas de todo su pueblo", "B) Una lista de reglas escritas en piedra", "C) Un concurso de dibujo semanal"),
-                    correctAnswer = "A) La 'Hora de las Buenas Ideas' para recibir propuestas de todo su pueblo",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(37, "¿Por qué el rey Adrián pensaba que no necesitaba escuchar a los demás?", listOf("Porque creía que como rey siempre tenía la mejor respuesta", "Porque su consejera le dijo que no escuchara a nadie", "Porque los demás siempre decían tonterías"), "Porque creía que como rey siempre tenía la mejor respuesta", "Inferencial ⭐"),
+                TriviaQuestion(38, "¿Qué nos demuestra el problema del estanque sobre la importancia de conocer bien una situación antes de actuar?", listOf("Que sin escuchar a los demás se pueden tomar decisiones equivocadas", "Que construir canales grandes siempre es la mejor opción", "Que los problemas del agua se resuelven solos"), "Que sin escuchar a los demás se pueden tomar decisiones equivocadas", "Inferencial ⭐"),
+                TriviaQuestion(39, "¿Por qué el gran canal no solucionó el problema del agua?", listOf("Porque la causa real era una pequeña rama caída, no la falta de un canal", "Porque el canal estaba mal construido", "Porque no había agua en el río"), "Porque la causa real era una pequeña rama caída, no la falta de un canal", "Inferencial ⭐"),
+                TriviaQuestion(40, "¿Qué pudo haber sentido Clara cuando el rey nunca se detenía a escuchar a los niños?", listOf("Frustración y tristeza al sentir que sus opiniones no valían", "Alegría porque no tenía que hablar con él", "Enojo y ganas de no ayudar más al reino"), "Frustración y tristeza al sentir que sus opiniones no valían", "Inferencial ⭐"),
+                TriviaQuestion(41, "¿Por qué una idea sencilla, como observar una rama caída, resultó más útil que una obra muy grande?", listOf("Porque atacaba directamente la raíz del problema", "Porque era más fácil de entender", "Porque las ramas siempre tienen la culpa de todo"), "Porque atacaba directamente la raíz del problema", "Inferencial ⭐"),
+                TriviaQuestion(42, "¿Qué cambió en la forma de gobernar del rey después de descubrir la verdadera causa del problema?", listOf("Aprendió a ser humilde y a escuchar todas las voces de su pueblo", "Decidió no volver a construir canales nunca más", "Despidió a su consejera por no avisarle"), "Aprendió a ser humilde y a escuchar todas las voces de su pueblo", "Inferencial ⭐"),
+                TriviaQuestion(43, "¿Cómo habría sido el futuro del reino si el rey hubiera seguido creyendo que siempre tenía la razón?", listOf("Los problemas habrían empeorado y el pueblo se habría desunido", "Habría sido el reino más próspero del mundo", "Nadie se habría dado cuenta del cambio"), "Los problemas habrían empeorado y el pueblo se habría desunido", "Inferencial ⭐"),
+                TriviaQuestion(44, "¿Por qué las ideas de los niños fueron tan importantes como las de los adultos?", listOf("Porque todos tienen una perspectiva única y valiosa para aportar", "Porque los niños saben más de ingeniería que los adultos", "Porque solo los niños ven las ramas caídas"), "Porque todos tienen una perspectiva única y valiosa para aportar", "Inferencial ⭐"),
+                TriviaQuestion(45, "¿Qué enseñanza transmitía la actividad llamada \"La Hora de las Buenas Ideas\"?", listOf("Que el trabajo en equipo y escuchar a otros fortalece a la comunidad", "Que todos tienen derecho a quejarse del rey", "Que hablar es más importante que trabajar"), "Que el trabajo en equipo y escuchar a otros fortalece a la comunidad", "Inferencial ⭐"),
+                TriviaQuestion(46, "¿En qué situaciones de la escuela escuchar a todos puede ayudar a resolver un problema?", listOf("En los trabajos grupales donde cada compañero tiene diferentes ideas", "Al hacer un examen sorpresa", "Cuando el profesor está explicando un tema"), "En los trabajos grupales donde cada compañero tiene diferentes ideas", "Inferencial ⭐"),
+                TriviaQuestion(47, "¿Crees que reconocer un error hace que una persona sea más débil o más sabia?", listOf("Más sabia, porque le permite aprender y tomar mejores decisiones", "Más débil, porque demuestra que no sabe nada", "No cambia en nada a la persona"), "Más sabia, porque le permite aprender y tomar mejores decisiones", "Inferencial ⭐"),
+                TriviaQuestion(48, "¿Qué puedes hacer en tu vida diaria para demostrar que escuchas con respeto las opiniones de otras personas?", listOf("Prestar atención sin interrumpir y valorar sus ideas", "Darles la razón aunque no estén en lo correcto", "Ignorarlos si creo que estoy en lo correcto"), "Prestar atención sin interrumpir y valorar sus ideas", "Inferencial ⭐")
             )
             "robot" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Quién era la brillante inventora que creó al robot R-7?",
-                    options = listOf("A) Clara la niña", "B) Elena la inventora", "C) Doña Elvira"),
-                    correctAnswer = "B) Elena la inventora",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Qué situación le causaba mucho estrés a R-7?",
-                    options = listOf("A) Quería hacer todo perfectamente desde el primer intento and se frustraba al fallar", "B) No le gustaba ordenar libros en la biblioteca", "C) Le temía a la Gran Feria de Inventos"),
-                    correctAnswer = "A) Quería hacer todo perfectamente desde el primer intento and se frustraba al fallar",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Qué percance sufrió R-7 durante la demostración en la Gran Feria?",
-                    options = listOf("A) Se le descargó la batería por completo", "B) Dejó caer una pila entera de libros por ponerse nervioso", "C) Rompió una maceta al regar una planta"),
-                    correctAnswer = "B) Dejó caer una pila entera de libros por ponerse nervioso",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Qué le dijo el famoso inventor que felicitó a R-7?",
-                    options = listOf("A) Que su velocidad para acomodar libros fue asombrosa", "B) Que la mejor parte fue que, tras equivocarse, no se rindió y continuó", "C) Que los robots nunca deben cometer fallos"),
-                    correctAnswer = "B) Que la mejor parte fue que, tras equivocarse, no se rindió y continuó",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Cómo cambió la actitud de R-7 respecto a sus propios errores?",
-                    options = listOf("A) Dejó de decir 'he fallado' y empezó a decir 'hoy aprendí una nueva manera de hacerlo mejor'", "B) Decidió no volver a participar en ferias de inventos", "C) Decidió que ordenar libros era demasiado difícil"),
-                    correctAnswer = "A) Dejó de decir 'he fallado' y empezó a decir 'hoy aprendí una nueva manera de hacerlo mejor'",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(49, "¿Por qué R-7 se sentía triste cada vez que cometía un error?", listOf("Porque quería ser perfecto y creía que equivocarse lo hacía un mal robot", "Porque su creadora lo regañaba siempre", "Porque los otros robots se reían de él"), "Porque quería ser perfecto y creía que equivocarse lo hacía un mal robot", "Inferencial ⭐"),
+                TriviaQuestion(50, "¿Qué nos demuestra la actitud de Elena sobre la manera en que debemos aprender cosas nuevas?", listOf("Que el aprendizaje requiere paciencia y aceptar los errores como lecciones", "Que debemos hacerlo todo bien desde el primer intento", "Que solo los robots pueden aprender cosas nuevas"), "Que el aprendizaje requiere paciencia y aceptar los errores como lecciones", "Inferencial ⭐"),
+                TriviaQuestion(51, "¿Por qué R-7 se puso más nervioso cuando comenzó la presentación en la feria?", listOf("Porque sentía la presión del público y temía fallar frente a ellos", "Porque las luces de la feria eran muy fuertes", "Porque no sabía cómo ordenar libros"), "Porque sentía la presión del público y temía fallar frente a ellos", "Inferencial ⭐"),
+                TriviaQuestion(52, "¿Qué habría pasado si el público se hubiera burlado del robot en lugar de ayudarlo?", listOf("R-7 se habría rendido y perdido por completo la confianza en sí mismo", "R-7 habría ordenado los libros mucho más rápido", "A R-7 no le habría importado en absoluto"), "R-7 se habría rendido y perdido por completo la confianza en sí mismo", "Inferencial ⭐"),
+                TriviaQuestion(53, "¿Por qué la ayuda de los niños fue importante para que R-7 recuperara la confianza?", listOf("Le demostró que equivocarse es normal y que siempre hay personas dispuestas a ayudar", "Porque le enseñaron un truco para ordenar más rápido", "Porque los niños son mejores robots que él"), "Le demostró que equivocarse es normal y que siempre hay personas dispuestas a ayudar", "Inferencial ⭐"),
+                TriviaQuestion(54, "¿Qué quiso enseñar el inventor cuando dijo que lo mejor de la presentación fue que R-7 no se rindió?", listOf("Que la perseverancia ante el fracaso es más valiosa que la perfección", "Que era el robot más rápido de toda la feria", "Que dejar caer los libros es una buena estrategia"), "Que la perseverancia ante el fracaso es más valiosa que la perfección", "Inferencial ⭐"),
+                TriviaQuestion(55, "¿Cómo cambió la forma de pensar del robot desde el inicio hasta el final del cuento?", listOf("Dejó de buscar la perfección y empezó a ver los errores como oportunidades para mejorar", "Decidió no volver a participar en ninguna feria", "Pensó que ya era el mejor robot del mundo"), "Dejó de buscar la perfección y empezó a ver los errores como oportunidades para mejorar", "Inferencial ⭐"),
+                TriviaQuestion(56, "¿Por qué aprender de los errores puede ser más valioso que hacer todo bien desde el principio?", listOf("Porque nos enseña a ser resilientes y a entender mejor cómo funcionan las cosas", "Porque fallar es más divertido que triunfar", "Porque los errores nos hacen perder el tiempo"), "Porque nos enseña a ser resilientes y a entender mejor cómo funcionan las cosas", "Inferencial ⭐"),
+                TriviaQuestion(57, "¿Qué relación existe entre practicar muchas veces y alcanzar una meta?", listOf("La práctica constante nos permite corregir fallas y dominar nuevas habilidades", "No hay relación, el talento es lo único que importa", "Practicar mucho nos asegura que nunca nos equivocaremos"), "La práctica constante nos permite corregir fallas y dominar nuevas habilidades", "Inferencial ⭐"),
+                TriviaQuestion(58, "¿En qué momentos de la vida escolar un estudiante puede sentirse como R-7?", listOf("Al equivocarse al responder una pregunta frente a toda la clase", "Al sacar la mejor nota en un examen", "Al ayudar a ordenar la biblioteca de la escuela"), "Al equivocarse al responder una pregunta frente a toda la clase", "Inferencial ⭐"),
+                TriviaQuestion(59, "¿Crees que una persona aprende más cuando nunca se equivoca o cuando analiza sus errores y vuelve a intentarlo?", listOf("Al analizar sus errores, porque eso genera verdadero aprendizaje", "Cuando nunca se equivoca, porque eso demuestra inteligencia", "No se aprende nada al equivocarse"), "Al analizar sus errores, porque eso genera verdadero aprendizaje", "Inferencial ⭐"),
+                TriviaQuestion(60, "¿Qué enseñanza de este cuento podrías aplicar la próxima vez que una tarea te resulte difícil?", listOf("Recordar que fallar es parte del proceso y seguir intentando con entusiasmo", "Rendirme y pedirle a alguien más que lo haga por mí", "Ocultar mis errores para que nadie los vea"), "Recordar que fallar es parte del proceso y seguir intentando con entusiasmo", "Inferencial ⭐")
             )
             "dragon" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Qué salía de la boca de Drake en lugar de fuego?",
-                    options = listOf("A) Humo negro denso", "B) Pequeñas burbujas de colores brillantes", "C) Hielo picado"),
-                    correctAnswer = "B) Pequeñas burbujas de colores brillantes",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Por qué se sentía triste Drake al principio de la historia?",
-                    options = listOf("A) Porque no tenía escamas verdes", "B) Porque pensaba que un dragón que no escupía fuego no servía para nada", "C) Porque sus hermanos eran malos con él"),
-                    correctAnswer = "B) Porque pensaba que un dragón que no escupía fuego no servía para nada",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Qué gran problema ocurrió en el pueblo de los duendes?",
-                    options = listOf("A) El estanque del pueblo se secó", "B) Una tormenta de nieve apagó las chimeneas y causó un frío intenso", "C) Un ogro gigante los asustó"),
-                    correctAnswer = "B) Una tormenta de nieve apagó las chimeneas y causó un frío intenso",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Por qué fallaron las llamaradas de los hermanos mayores de Drake?",
-                    options = listOf("A) Eran tan calientes que quemaban los techos y asustaban a los duendes", "B) Se apagaron de inmediato por el viento", "C) No tenían suficiente poder"),
-                    correctAnswer = "A) Eran tan calientes que quemaban los techos y asustaban a los duendes",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Qué gran lección aprendió Drake al final de su aventura?",
-                    options = listOf("A) Que debía aprender a lanzar fuego como los demás", "B) Que ser diferente lo hacía único y valioso para ayudar con calidez", "C) Que los duendes sabían hacer mejores medallas"),
-                    correctAnswer = "B) Que ser diferente lo hacía único y valioso para ayudar con calidez",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(61, "¿Por qué Drake pensaba que no servía para nada?", listOf("Porque no podía escupir fuego como los demás dragones, solo burbujas de colores", "Porque era muy pequeño y no podía volar", "Porque no tenía escamas brillantes"), "Porque no podía escupir fuego como los demás dragones, solo burbujas de colores", "Inferencial ⭐"),
+                TriviaQuestion(62, "¿Qué nos demuestra que Drake no intentara ser como sus hermanos durante la tormenta?", listOf("Que aceptó su propia naturaleza y buscó otra forma de ayudar", "Que era demasiado miedoso para intentarlo", "Que no le importaban los duendes"), "Que aceptó su propia naturaleza y buscó otra forma de ayudar", "Inferencial ⭐"),
+                TriviaQuestion(63, "¿Por qué las llamaradas de los hermanos mayores no solucionaron el problema de los duendes?", listOf("Eran demasiado calientes y quemaban los techos en lugar de dar calor suave", "No eran lo suficientemente fuertes para derretir la nieve", "Los duendes eran alérgicos al fuego"), "Eran demasiado calientes y quemaban los techos en lugar de dar calor suave", "Inferencial ⭐"),
+                TriviaQuestion(64, "¿Qué pudo haber sentido Drake cuando el gran jefe de los dragones le dio una medalla?", listOf("Mucho orgullo y seguridad en sí mismo", "Vergüenza por ser diferente", "Envidia de las medallas de sus hermanos"), "Mucho orgullo y seguridad en sí mismo", "Inferencial ⭐"),
+                TriviaQuestion(65, "¿Por qué las burbujas de colores de Drake fueron mejores que el fuego ardiente?", listOf("Porque brindaban un calor suave y acogedor que no causaba daños", "Porque eran más fáciles de hacer", "Porque explotaban y asustaban a la tormenta"), "Porque brindaban un calor suave y acogedor que no causaba daños", "Inferencial ⭐"),
+                TriviaQuestion(66, "¿Qué enseñanza transmite el hecho de que Drake no quisiera vengarse de las burlas de sus hermanos?", listOf("Que es mejor responder con amor y ayudando a los demás", "Que tenía miedo de pelear con ellos", "Que no se había dado cuenta de las burlas"), "Que es mejor responder con amor y ayudando a los demás", "Inferencial ⭐"),
+                TriviaQuestion(67, "¿Cómo habría terminado la historia si Drake no se hubiera atrevido a usar sus burbujas?", listOf("Los duendes habrían pasado mucho frío o perdido sus casas por el fuego", "Los duendes habrían hecho su propio fuego", "Sus hermanos habrían aprendido a soplar más suave"), "Los duendes habrían pasado mucho frío o perdido sus casas por el fuego", "Inferencial ⭐"),
+                TriviaQuestion(68, "¿Por qué es importante aceptar nuestras propias diferencias según este cuento?", listOf("Porque lo que nos hace diferentes también puede ser nuestro mayor talento", "Porque así podemos ser famosos en todo el reino", "Porque no podemos cambiar lo que somos aunque queramos"), "Porque lo que nos hace diferentes también puede ser nuestro mayor talento", "Inferencial ⭐"),
+                TriviaQuestion(69, "¿Qué descubrió Drake sobre el verdadero valor de ayudar a los demás?", listOf("Que la calidez del corazón protege mejor que la fuerza destructiva", "Que solo los fuertes pueden ayudar", "Que ayudar a otros te da medallas"), "Que la calidez del corazón protege mejor que la fuerza destructiva", "Inferencial ⭐"),
+                TriviaQuestion(70, "¿En qué situaciones de la escuela un talento 'diferente' puede ser muy útil?", listOf("Cuando alguien aporta una idea creativa que los demás no habían pensado", "Cuando todos hacen exactamente lo mismo", "Cuando hay que competir en una carrera de velocidad"), "Cuando alguien aporta una idea creativa que los demás no habían pensado", "Inferencial ⭐"),
+                TriviaQuestion(71, "¿Crees que Drake era más débil que sus hermanos por no lanzar fuego?", listOf("No, su habilidad era distinta pero igualmente poderosa e importante", "Sí, el fuego siempre es mejor que las burbujas", "Sí, pero era más simpático"), "No, su habilidad era distinta pero igualmente poderosa e importante", "Inferencial ⭐"),
+                TriviaQuestion(72, "¿Qué puedes hacer en tu vida diaria para usar tus talentos únicos?", listOf("Reconocer en qué soy bueno y utilizarlo para ayudar a mis amigos", "Tratar de copiar lo que hacen los demás", "Esconderlos para que no se burlen de mí"), "Reconocer en qué soy bueno y utilizarlo para ayudar a mis amigos", "Inferencial ⭐")
             )
             "pirata" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Qué valioso objeto perdió la capitana Marina durante la tormenta?",
-                    options = listOf("A) Su sombrero pirata", "B) Su brújula dorada tan precisa", "C) El mapa de la isla misteriosa"),
-                    correctAnswer = "B) Su brújula dorada tan precisa",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Quién consoló a Marina diciéndole que un buen capitán mira a su tripulación?",
-                    options = listOf("A) El loro Pico", "B) El carpintero del barco", "C) Un delfín del océano"),
-                    correctAnswer = "A) El loro Pico",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Cómo lograron guiar el barco en la noche sin la brújula?",
-                    options = listOf("A) Usando un mapa secreto", "B) Uniendo talentos (observando estrellas, viento y mástil)", "C) Esperando que amaneciera inmóviles"),
-                    correctAnswer = "B) Uniendo talentos (observando estrellas, viento y mástil)",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Qué peligro peligroso lograron esquivar trabajando en equipo?",
-                    options = listOf("A) Un ataque de tiburones gigantes", "B) Unos arrecifes de coral muy peligrosos", "C) Un remolino gigante"),
-                    correctAnswer = "B) Unos arrecifes de coral muy peligrosos",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Cuál fue el verdadero tesoro que descubrieron al llegar a la isla?",
-                    options = listOf("A) Un cofre lleno de rubíes y monedas de oro", "B) Saber que el trabajo en equipo y la confianza mutua son la mejor guía", "C) Una estatua antigua de plata"),
-                    correctAnswer = "B) Saber que el trabajo en equipo y la confianza mutua son la mejor guía",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(73, "¿Por qué Marina se desesperó tanto al perder su brújula dorada?", listOf("Porque creía que dependía solo de ese objeto para poder navegar", "Porque era muy cara y de oro puro", "Porque era un regalo que no quería perder"), "Porque creía que dependía solo de ese objeto para poder navegar", "Inferencial ⭐"),
+                TriviaQuestion(74, "¿Qué nos demuestra el loro Pico al decirle que un verdadero capitán mira a su tripulación?", listOf("Que la verdadera fuerza de un líder está en confiar en su equipo", "Que el loro era el verdadero capitán", "Que la tripulación tenía otra brújula escondida"), "Que la verdadera fuerza de un líder está en confiar en su equipo", "Inferencial ⭐"),
+                TriviaQuestion(75, "¿Por qué la tripulación no se asustó cuando se perdió la brújula?", listOf("Porque confiaban en sí mismos y en sus habilidades conjuntas", "Porque no sabían lo importante que era una brújula", "Porque querían perderse a propósito"), "Porque confiaban en sí mismos y en sus habilidades conjuntas", "Inferencial ⭐"),
+                TriviaQuestion(76, "¿Qué habría pasado si Marina no hubiera confiado en las habilidades de su tripulación?", listOf("Habrían chocado contra los arrecifes y perdido el barco", "Habrían encontrado la brújula mágicamente", "Habrían esperado en el mar hasta que pasara la tormenta"), "Habrían chocado contra los arrecifes y perdido el barco", "Inferencial ⭐"),
+                TriviaQuestion(77, "¿Por qué observar las estrellas y el viento resultó tan efectivo como la brújula?", listOf("Porque utilizaron los conocimientos de todos para guiar el barco", "Porque las estrellas son más brillantes que la brújula", "Porque el viento siempre sopla hacia el tesoro"), "Porque utilizaron los conocimientos de todos para guiar el barco", "Inferencial ⭐"),
+                TriviaQuestion(78, "¿Qué enseñanza transmite el descubrimiento de la isla que no estaba en el mapa?", listOf("Que el trabajo en equipo puede llevarnos a lugares maravillosos e inesperados", "Que los mapas piratas siempre están equivocados", "Que perder cosas siempre trae buena suerte"), "Que el trabajo en equipo puede llevarnos a lugares maravillosos e inesperados", "Inferencial ⭐"),
+                TriviaQuestion(79, "¿Cómo cambió Marina su forma de liderar después de la tormenta?", listOf("Comprendió que el verdadero liderazgo requiere confiar en los talentos de los demás", "Decidió comprar tres brújulas por si acaso", "Dejó que el loro Pico fuera el nuevo capitán"), "Comprendió que el verdadero liderazgo requiere confiar en los talentos de los demás", "Inferencial ⭐"),
+                TriviaQuestion(80, "¿Por qué es importante escuchar a los demás cuando enfrentamos un problema difícil?", listOf("Porque muchas mentes juntas encuentran mejores soluciones que una sola", "Porque si escuchamos a los demás, nosotros no tenemos que pensar", "Porque es de buena educación aunque no sirva de nada"), "Porque muchas mentes juntas encuentran mejores soluciones que una sola", "Inferencial ⭐"),
+                TriviaQuestion(81, "¿Qué descubrió Marina sobre el trabajo en equipo?", listOf("Que la confianza mutua es la mejor guía frente a cualquier tormenta", "Que es más rápido navegar sin ayuda de nadie", "Que los loros son buenos navegantes"), "Que la confianza mutua es la mejor guía frente a cualquier tormenta", "Inferencial ⭐"),
+                TriviaQuestion(82, "¿En qué situaciones de la escuela el trabajo en equipo es fundamental?", listOf("En los proyectos grupales o al jugar deportes en equipo", "Al realizar un examen individual", "Cuando hay que estar en silencio leyendo"), "En los proyectos grupales o al jugar deportes en equipo", "Inferencial ⭐"),
+                TriviaQuestion(83, "¿Crees que perder la brújula fue algo malo o algo bueno para Marina al final?", listOf("Fue algo bueno porque le enseñó a valorar a su tripulación", "Fue algo malo porque la isla no tenía oro", "No importó porque luego la encontró de nuevo"), "Fue algo bueno porque le enseñó a valorar a su tripulación", "Inferencial ⭐"),
+                TriviaQuestion(84, "¿Qué puedes hacer para demostrar que confías en tus compañeros?", listOf("Escuchar sus ideas y permitirles usar sus habilidades", "Hacer todo el trabajo yo solo para asegurar que salga bien", "Decirles que hagan todo el trabajo mientras yo descanso"), "Escuchar sus ideas y permitirles usar sus habilidades", "Inferencial ⭐")
             )
             "astronauta" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Dónde vivía y trabajaba el astronauta Leo?",
-                    options = listOf("A) En una base subterránea en Marte", "B) En la Estación Espacial Internacional", "C) En la Luna"),
-                    correctAnswer = "B) En la Estación Espacial Internacional",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Qué comenzó a extrañar Leo después de varias semanas?",
-                    options = listOf("A) Los postres espaciales", "B) El olor a lluvia, el canto de aves y los abrazos de su familia", "C) La falta de gravedad de la estación"),
-                    correctAnswer = "B) El olor a lluvia, el canto de aves y los abrazos de su familia",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Qué le regaló su compañera astronauta Sara para animarlo?",
-                    options = listOf("A) Un telescopio de alta tecnología", "B) Un proyector holográfico con mensajes en video de su familia", "C) Una planta espacial de menta"),
-                    correctAnswer = "B) Un proyector holográfico con mensajes en video de su familia",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Qué valioso descubrimiento hizo Leo sobre la distancia?",
-                    options = listOf("A) Que la distancia física no rompe los lazos invisibles del amor sincero", "B) Que es imposible vivir lejos del hogar", "C) Que las estrellas brillan menos cuando estás triste"),
-                    correctAnswer = "A) Que la distancia física no rompe los lazos invisibles del amor sincero",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Cómo completó Leo su misión en el espacio?",
-                    options = listOf("A) Con desgana y ganas de regresar", "B) Con éxito, renovada alegría y sintiéndose conectado con los suyos", "C) Dejándola incompleta"),
-                    correctAnswer = "B) Con éxito, renovada alegría y sintiéndose conectado con los suyos",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(85, "¿Por qué Leo se sentía triste en la Estación Espacial a pesar de hacer cosas increíbles?", listOf("Porque extrañaba la Tierra y los abrazos de su familia", "Porque no le gustaba la comida espacial", "Porque tenía miedo de flotar sin gravedad"), "Porque extrañaba la Tierra y los abrazos de su familia", "Inferencial ⭐"),
+                TriviaQuestion(86, "¿Qué nos demuestra que Leo valorara tanto el olor de la lluvia y el canto de los pájaros?", listOf("Que las pequeñas cosas de la vida diaria son las más importantes", "Que no le gustaba el silencio del espacio", "Que quería ser granjero y no astronauta"), "Que las pequeñas cosas de la vida diaria son las más importantes", "Inferencial ⭐"),
+                TriviaQuestion(87, "¿Por qué su compañera Sara le regaló un proyector holográfico?", listOf("Porque notó su tristeza y quería ayudarlo a sentirse cerca de su familia", "Porque a Sara ya no le servía el proyector", "Porque era su cumpleaños y debía darle un regalo"), "Porque notó su tristeza y quería ayudarlo a sentirse cerca de su familia", "Inferencial ⭐"),
+                TriviaQuestion(88, "¿Qué sintió Leo al ver los mensajes de su esposa y su hijo?", listOf("Sintió que la distancia física desaparecía gracias al lazo del amor", "Sintió más ganas de volver inmediatamente a la Tierra", "Sintió que el holograma se veía borroso"), "Sintió que la distancia física desaparecía gracias al lazo del amor", "Inferencial ⭐"),
+                TriviaQuestion(89, "¿Por qué el amor verdadero no conoce de distancias físicas según este cuento?", listOf("Porque el amor viaja en el corazón y nos acompaña dondequiera que vayamos", "Porque viaja a la velocidad de la luz", "Porque los hologramas pueden enviarse por internet espacial"), "Porque el amor viaja en el corazón y nos acompaña dondequiera que vayamos", "Inferencial ⭐"),
+                TriviaQuestion(90, "¿Qué enseñanza transmite que Leo pudiera completar su misión con alegría después de ver el video?", listOf("Que el apoyo emocional de los seres queridos nos da fuerza para cumplir nuestras metas", "Que trabajar en el espacio es muy fácil", "Que los hologramas mejoran la concentración"), "Que el apoyo emocional de los seres queridos nos da fuerza para cumplir nuestras metas", "Inferencial ⭐"),
+                TriviaQuestion(91, "¿Cómo habría sido la misión de Leo si no hubiera recibido el apoyo de Sara y su familia?", listOf("Habría estado deprimido y tal vez no habría hecho un buen trabajo", "Habría sido exactamente igual pero más aburrida", "Habría renunciado y regresado en una nave de emergencia"), "Habría estado deprimido y tal vez no habría hecho un buen trabajo", "Inferencial ⭐"),
+                TriviaQuestion(92, "¿Por qué es importante mantenerse en contacto con las personas que amamos?", listOf("Porque nos ayuda a sentirnos acompañados y felices", "Porque nos pueden enviar regalos", "Para que no se olviden de nosotros"), "Porque nos ayuda a sentirnos acompañados y felices", "Inferencial ⭐"),
+                TriviaQuestion(93, "¿Qué descubrió Leo sobre los lazos del corazón?", listOf("Que son invisibles, indestructibles y brillan más que cualquier estrella", "Que son más fuertes que la gravedad terrestre", "Que solo existen en la Tierra"), "Que son invisibles, indestructibles y brillan más que cualquier estrella", "Inferencial ⭐"),
+                TriviaQuestion(94, "¿En qué situaciones un niño puede sentirse como Leo en la estación espacial?", listOf("Cuando tiene que estar lejos de sus padres por un tiempo", "Cuando va al cine con sus amigos", "Cuando está jugando en el recreo"), "Cuando tiene que estar lejos de sus padres por un tiempo", "Inferencial ⭐"),
+                TriviaQuestion(95, "¿Crees que Leo será un mejor astronauta ahora que sabe que el amor cruza el espacio?", listOf("Sí, porque realizará su trabajo con más motivación y paz", "No, seguirá siendo exactamente igual de bueno", "No, porque ahora pasará todo el día viendo el holograma"), "Sí, porque realizará su trabajo con más motivación y paz", "Inferencial ⭐"),
+                TriviaQuestion(96, "¿Qué puedes hacer para que tus amigos o familiares se sientan cerca aunque estén lejos?", listOf("Enviarles un mensaje de cariño o una carta demostrando que pienso en ellos", "Esperar a que ellos me llamen primero", "Olvidarlos hasta que vuelvan a estar cerca"), "Enviarles un mensaje de cariño o una carta demostrando que pienso en ellos", "Inferencial ⭐")
             )
             "ardilla" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Qué alimento recolectaba y escondía Susi durante el otoño?",
-                    options = listOf("A) Manzanas rojas", "B) Nueces deliciosas", "C) Bayas del bosque"),
-                    correctAnswer = "B) Nueces deliciosas",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Por qué Susi no podía encontrar sus nueces escondidas en invierno?",
-                    options = listOf("A) Porque se las robaron los castores", "B) Porque una tormenta de nieve cubrió todo el suelo y perdió la memoria", "C) Porque las nueces se desvanecieron"),
-                    correctAnswer = "B) Porque una tormenta de nieve cubrió todo el suelo y perdió la memoria",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Qué le impedía a Susi pedir ayuda al principio?",
-                    options = listOf("A) Su orgullo y vergüenza de admitir su error", "B) Que no hablaba con ningún vecino", "C) Que prefería buscar sola bajo el hielo"),
-                    correctAnswer = "A) Su orgullo y vergüenza de admitir su error",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Quién fue el primer amigo en ofrecerle compartir su comida?",
-                    options = listOf("A) El oso de la montaña", "B) El conejo Pepe con zanahorias y piñones", "C) El loro sabio"),
-                    correctAnswer = "B) El conejo Pepe con zanahorias y piñones",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Qué gran lección aprendió Susi al final del invierno?",
-                    options = listOf("A) Que buscar comida sola es más rápido", "B) Que cometer errores es normal y pedir ayuda nos une en comunidad", "C) Que es mejor comer solo zanahorias"),
-                    correctAnswer = "B) Que cometer errores es normal y pedir ayuda nos une en comunidad",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(97, "¿Por qué Susi se negaba a pedir ayuda cuando no encontraba sus nueces?", listOf("Porque era muy orgullosa y le daba vergüenza admitir que había olvidado dónde estaban", "Porque creía que los demás se las iban a robar", "Porque no quería hablar con el conejo Pepe"), "Porque era muy orgullosa y le daba vergüenza admitir que había olvidado dónde estaban", "Inferencial ⭐"),
+                TriviaQuestion(98, "¿Qué nos demuestra la actitud del conejo Pepe al ofrecerle zanahorias a Susi?", listOf("Que los verdaderos amigos ayudan sin juzgar los errores de los demás", "Que los conejos prefieren las zanahorias a las nueces", "Que Pepe quería cambiar zanahorias por nueces"), "Que los verdaderos amigos ayudan sin juzgar los errores de los demás", "Inferencial ⭐"),
+                TriviaQuestion(99, "¿Por qué Susi pensaba que era la ardilla más inteligente?", listOf("Porque se confiaba demasiado en su buena memoria y presumía de ella", "Porque había leído muchos libros en el bosque", "Porque nadie más sabía esconder nueces"), "Porque se confiaba demasiado en su buena memoria y presumía de ella", "Inferencial ⭐"),
+                TriviaQuestion(100, "¿Qué sintió Susi cuando todos los animales se unieron para ayudarla a buscar?", listOf("Sintió un gran alivio y agradecimiento por tener una comunidad unida", "Sintió mucha vergüenza y salió corriendo", "Se enojó porque ella quería encontrarlas sola"), "Sintió un gran alivio y agradecimiento por tener una comunidad unida", "Inferencial ⭐"),
+                TriviaQuestion(101, "¿Por qué pedir ayuda a los amigos no nos hace débiles, sino humildes?", listOf("Porque demuestra que reconocemos nuestros límites y valoramos el apoyo de los demás", "Porque nos permite descansar mientras otros trabajan", "Porque es una forma fácil de salir de problemas"), "Porque demuestra que reconocemos nuestros límites y valoramos el apoyo de los demás", "Inferencial ⭐"),
+                TriviaQuestion(102, "¿Qué enseñanza transmite que todos colaboraran para encontrar las nueces bajo la nieve?", listOf("Que el trabajo en equipo hace que las tareas difíciles sean mucho más fáciles", "Que la nieve no es tan fría como parece", "Que todos los animales comen nueces en invierno"), "Que el trabajo en equipo hace que las tareas difíciles sean mucho más fáciles", "Inferencial ⭐"),
+                TriviaQuestion(103, "¿Cómo habría terminado la historia si Susi no hubiera aceptado la ayuda de Pepe?", listOf("Habría pasado mucha hambre y frío durante todo el invierno", "Habría encontrado las nueces en la primavera", "Habría tenido que comer corteza de árbol"), "Habría pasado mucha hambre y frío durante todo el invierno", "Inferencial ⭐"),
+                TriviaQuestion(104, "¿Por qué el orgullo puede ser un obstáculo para resolver problemas?", listOf("Porque nos impide reconocer que nos equivocamos y aceptar la ayuda necesaria", "Porque nos hace ver más grandes que los demás", "Porque el orgullo asusta a los amigos"), "Porque nos impide reconocer que nos equivocamos y aceptar la ayuda necesaria", "Inferencial ⭐"),
+                TriviaQuestion(105, "¿Qué descubrió Susi sobre vivir en comunidad?", listOf("Que cometer errores es normal y los amigos siempre están ahí para apoyarnos", "Que es mejor guardar las cosas en casa que en el bosque", "Que los conejos cavan más rápido que las ardillas"), "Que cometer errores es normal y los amigos siempre están ahí para apoyarnos", "Inferencial ⭐"),
+                TriviaQuestion(106, "¿En qué situaciones de la escuela un niño puede sentir vergüenza de pedir ayuda como Susi?", listOf("Cuando no entiende un problema de matemáticas y teme que se burlen de él", "Cuando se saca la nota más alta de la clase", "Al jugar en el recreo con todos sus amigos"), "Cuando no entiende un problema de matemáticas y teme que se burlen de él", "Inferencial ⭐"),
+                TriviaQuestion(107, "¿Crees que Susi presumirá de su memoria la próxima primavera?", listOf("Probablemente no, habrá aprendido a ser más humilde y agradecida", "Seguro que sí, porque es muy olvidadiza", "Sí, pero esconderá las nueces en otro lugar"), "Probablemente no, habrá aprendido a ser más humilde y agradecida", "Inferencial ⭐"),
+                TriviaQuestion(108, "¿Qué puedes hacer la próxima vez que te equivoques y no sepas cómo arreglarlo?", listOf("Pedir ayuda a mis amigos o maestros sin sentir vergüenza", "Tratar de esconder el error para que nadie se entere", "Llorar en un rincón hasta que alguien lo solucione"), "Pedir ayuda a mis amigos o maestros sin sentir vergüenza", "Inferencial ⭐")
             )
             "mago" -> listOf(
-                TriviaQuestion(
-                    id = 1,
-                    questionText = "¿Por qué Mateo el joven mago se sentía tan inseguro?",
-                    options = listOf("A) Porque no recordaba las palabras mágicas", "B) Porque creía que toda la magia provenía de su varita y no de sí mismo", "C) Porque sus hechizos salían al revés"),
-                    correctAnswer = "B) Porque creía que toda la magia provenía de su varita y no de sí mismo",
-                    difficultyLabel = "Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 2,
-                    questionText = "¿Qué accidente le sucedió a la varita de Mateo camino al examen?",
-                    options = listOf("A) Se le cayó en un pantano profundo", "B) Se partió en dos pedazos al tropezar con una raíz", "C) Un duende travieso se la robó"),
-                    correctAnswer = "B) Se partió en dos pedazos al tropezar con una raíz",
-                    difficultyLabel = "Medio-Fácil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 3,
-                    questionText = "¿Qué difícil tarea le pidió el Gran Maestro Mago en el examen final?",
-                    options = listOf("A) Hacer flotar un libro pesado", "B) Hacer brotar agua pura de una roca seca", "C) Transformar una flor en mariposa"),
-                    correctAnswer = "B) Hacer brotar agua pura de una roca seca",
-                    difficultyLabel = "Medio ⭐"
-                ),
-                TriviaQuestion(
-                    id = 4,
-                    questionText = "¿Cómo logró Mateo realizar el hechizo sin su varita?",
-                    options = listOf("A) Copiando a otro estudiante", "B) Respirando hondo y concentrando su fe en que sí podía lograrlo", "C) Usando un amuleto secreto de la academia"),
-                    correctAnswer = "B) Respirando hondo y concentrando su fe en que sí podía lograrlo",
-                    difficultyLabel = "Difícil ⭐"
-                ),
-                TriviaQuestion(
-                    id = 5,
-                    questionText = "¿Qué gran verdad le reveló el Gran Maestro sobre las varitas?",
-                    options = listOf("A) Que la varita es solo un canal y la verdadera magia está dentro de uno", "B) Que las varitas plateadas son de mala calidad", "C) Que el examen era una simple ilusión"),
-                    correctAnswer = "A) Que la varita es solo un canal y la verdadera magia está dentro de uno",
-                    difficultyLabel = "Muy Difícil ⭐"
-                )
+                TriviaQuestion(109, "¿Por qué Mateo creía que no tenía magia sin su varita?", listOf("Porque pensaba que el poder venía solo del objeto mágico y no de sí mismo", "Porque las varitas tienen toda la magia del mundo", "Porque su maestro nunca le enseñó a hacer magia sin ella"), "Porque pensaba que el poder venía solo del objeto mágico y no de sí mismo", "Inferencial ⭐"),
+                TriviaQuestion(110, "¿Qué nos demuestra la ruptura de la varita sobre las cosas materiales?", listOf("Que los objetos pueden romperse, pero el talento y la fe no se destruyen", "Que las varitas de madera no son de buena calidad", "Que Mateo era muy torpe con sus cosas"), "Que los objetos pueden romperse, pero el talento y la fe no se destruyen", "Inferencial ⭐"),
+                TriviaQuestion(111, "¿Por qué el Gran Maestro le pidió a Mateo el hechizo más difícil?", listOf("Para que Mateo descubriera que su verdadera fuerza no dependía de la varita", "Porque quería que reprobara el examen", "Porque era el único hechizo que faltaba por mostrar"), "Para que Mateo descubriera que su verdadera fuerza no dependía de la varita", "Inferencial ⭐"),
+                TriviaQuestion(112, "¿Qué habría pasado si Mateo se hubiera rendido al romperse su varita?", listOf("Habría reprobado el examen y nunca habría descubierto su verdadero potencial", "El maestro le habría dado una varita nueva inmediatamente", "Se habría dedicado a ser panadero"), "Habría reprobado el examen y nunca habría descubierto su verdadero potencial", "Inferencial ⭐"),
+                TriviaQuestion(113, "¿Por qué respirar hondo y concentrar su fe le ayudó a realizar el hechizo?", listOf("Porque la verdadera magia nace de la confianza en las propias capacidades", "Porque el aire le dio más fuerza a sus pulmones", "Porque así se asustó menos de equivocarse"), "Porque la verdadera magia nace de la confianza en las propias capacidades", "Inferencial ⭐"),
+                TriviaQuestion(114, "¿Qué enseñanza transmite que del manantial brotara agua pura solo con sus manos?", listOf("Que el ser humano tiene un gran poder interno cuando confía en sí mismo", "Que las manos sucias no pueden hacer magia", "Que el agua es el elemento más fácil de invocar"), "Que el ser humano tiene un gran poder interno cuando confía en sí mismo", "Inferencial ⭐"),
+                TriviaQuestion(115, "¿Cómo cambió la actitud de Mateo después de graduarse con honores?", listOf("Se llenó de confianza y dejó de dudar de sus propias habilidades", "Se volvió presumido y empezó a burlarse de los que usaban varita", "Decidió no volver a hacer magia nunca más"), "Se llenó de confianza y dejó de dudar de sus propias habilidades", "Inferencial ⭐"),
+                TriviaQuestion(116, "¿Por qué los objetos o herramientas solo nos ayudan, pero no hacen el trabajo por nosotros?", listOf("Porque la habilidad, la creatividad y el esfuerzo provienen de la persona", "Porque las herramientas se pueden perder muy fácil", "Porque los objetos mágicos no son reales"), "Porque la habilidad, la creatividad y el esfuerzo provienen de la persona", "Inferencial ⭐"),
+                TriviaQuestion(117, "¿Qué descubrió Mateo sobre el origen de la verdadera magia?", listOf("Que reside en la mente, el corazón y la confianza en uno mismo", "Que está escondida en los libros antiguos de la biblioteca", "Que viene de un cristal mágico en la montaña"), "Que reside en la mente, el corazón y la confianza en uno mismo", "Inferencial ⭐"),
+                TriviaQuestion(118, "¿En qué situaciones un estudiante puede depender demasiado de una 'varita', como unos apuntes o una calculadora?", listOf("Al no confiar en su propia memoria o capacidad de razonar", "Cuando tiene que resolver problemas muy largos", "Al estudiar para un examen de historia"), "Al no confiar en su propia memoria o capacidad de razonar", "Inferencial ⭐"),
+                TriviaQuestion(119, "¿Crees que Mateo volverá a necesitar una varita plateada para hacer magia?", listOf("Quizás la use como herramienta, pero ya no sentirá que depende exclusivamente de ella", "No, las varitas son inútiles para él ahora", "Sí, comprará una más fuerte que no se rompa"), "Quizás la use como herramienta, pero ya no sentirá que depende exclusivamente de ella", "Inferencial ⭐"),
+                TriviaQuestion(120, "¿Qué puedes hacer cuando enfrentes una prueba difícil y no tengas tus herramientas habituales?", listOf("Confiar en mis conocimientos y hacer mi mejor esfuerzo con lo que tenga", "Llorar y esperar a que alguien me preste sus herramientas", "Rendirme porque es imposible sin ellas"), "Confiar en mis conocimientos y hacer mi mejor esfuerzo con lo que tenga", "Inferencial ⭐")
             )
             else -> emptyList()
         }

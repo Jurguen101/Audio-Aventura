@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import java.util.Locale
 
 enum class Screen {
+    Credits,
     Home,
     StoryPreview,
     Story,
@@ -35,7 +36,7 @@ class MainViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Screen navigation
-    private val _currentScreen = MutableStateFlow(Screen.Home)
+    private val _currentScreen = MutableStateFlow(Screen.Credits)
     val currentScreen: StateFlow<Screen> = _currentScreen.asStateFlow()
 
     fun navigateTo(screen: Screen) {
@@ -48,6 +49,9 @@ class MainViewModel(
     // Active Story & Navigation State
     private val _activeChapterId = MutableStateFlow<String?>(null)
     val activeChapterId: StateFlow<String?> = _activeChapterId.asStateFlow()
+
+    private val _activeTriviaQuestions = MutableStateFlow<List<TriviaQuestion>>(emptyList())
+    val activeTriviaQuestions: StateFlow<List<TriviaQuestion>> = _activeTriviaQuestions.asStateFlow()
 
     private val _currentPageIndex = MutableStateFlow(0)
     val currentPageIndex: StateFlow<Int> = _currentPageIndex.asStateFlow()
@@ -97,7 +101,12 @@ class MainViewModel(
             repository.ensureSeeded()
         }
         try {
-            tts = TextToSpeech(application, this)
+            val ctx = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+                application.createAttributionContext("my_tag")
+            } else {
+                application
+            }
+            tts = TextToSpeech(ctx, this)
         } catch (e: Exception) {
             Log.e("MainViewModel", "Failed to initialize TTS", e)
         }
@@ -105,6 +114,12 @@ class MainViewModel(
 
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
+            tts?.setAudioAttributes(
+                android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_GAME)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build()
+            )
             var voiceSelected = false
             try {
                 val voices = tts?.voices
@@ -137,9 +152,9 @@ class MainViewModel(
             }
 
             if (!voiceSelected) {
-                val result = tts?.setLanguage(Locale("es", "ES")) ?: TextToSpeech.LANG_NOT_SUPPORTED
+                val result = tts?.setLanguage(Locale.forLanguageTag("es-ES")) ?: TextToSpeech.LANG_NOT_SUPPORTED
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    val fallbackResult = tts?.setLanguage(Locale("es")) ?: TextToSpeech.LANG_NOT_SUPPORTED
+                    val fallbackResult = tts?.setLanguage(Locale.forLanguageTag("es")) ?: TextToSpeech.LANG_NOT_SUPPORTED
                     if (fallbackResult == TextToSpeech.LANG_MISSING_DATA || fallbackResult == TextToSpeech.LANG_NOT_SUPPORTED) {
                         tts?.language = Locale.getDefault()
                     }
@@ -184,6 +199,13 @@ class MainViewModel(
         _currentPageIndex.value = 0
         _currentQuestionIndex.value = 0
         _starsEarnedInCurrentAdventure.value = 0
+        
+        // Load 5 random questions for this chapter and randomize options
+        val allQuestions = TriviaProvider.getQuestionsForChapter(chapterId)
+        _activeTriviaQuestions.value = allQuestions.shuffled().take(5).map { q ->
+            q.copy(options = q.options.shuffled())
+        }
+        
         resetTriviaState()
         stopSpeaking()
         speakCurrentPage()
@@ -249,8 +271,7 @@ class MainViewModel(
     }
 
     fun getActiveQuestions(): List<TriviaQuestion> {
-        val chapterId = _activeChapterId.value ?: return emptyList()
-        return TriviaProvider.getQuestionsForChapter(chapterId)
+        return _activeTriviaQuestions.value
     }
 
     fun checkTriviaAnswer() {
@@ -267,9 +288,6 @@ class MainViewModel(
             _isTriviaCorrect.value = true
             _starsEarnedInCurrentAdventure.value += 1
             speakText("¡Excelente respuesta! Has ganado una estrella de papel.")
-            viewModelScope.launch {
-                repository.addStars(1)
-            }
         } else {
             _isTriviaCorrect.value = false
             speakText("¡Oh, no es correcto! Pero puedes usar una carta comodín de papel o continuar.")
@@ -287,6 +305,7 @@ class MainViewModel(
             val chapterId = _activeChapterId.value ?: return
             val starsEarned = _starsEarnedInCurrentAdventure.value
             viewModelScope.launch {
+                repository.addStars(starsEarned)
                 repository.completeChapter(chapterId, starsEarned)
             }
             navigateTo(Screen.Home)
@@ -324,9 +343,17 @@ class MainViewModel(
             val success = repository.buyCharacter(characterId)
             if (success) {
                 speakText("¡Felicidades! Has desbloqueado este personaje de cartón.")
+                repository.equipCharacter(characterId) // Auto-equip when bought
             } else {
                 speakText("Necesitas tres estrellas para desbloquear este personaje.")
             }
+        }
+    }
+
+    fun equipCharacter(characterId: String) {
+        viewModelScope.launch {
+            repository.equipCharacter(characterId)
+            speakText("Personaje seleccionado como compañero.")
         }
     }
 

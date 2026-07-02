@@ -46,7 +46,10 @@ fun DioramaCard(
     content: @Composable BoxScope.() -> Unit
 ) {
     val clickModifier = if (onClick != null) {
-        Modifier.clickable { onClick() }
+        Modifier.clickable { 
+            com.example.utils.SoundManager.playPop()
+            onClick() 
+        }
     } else {
         Modifier
     }
@@ -149,7 +152,10 @@ fun DioramaHeader(
                     .size(38.dp)
                     .background(Color(0xFFFDEDEC), shape = CircleShape)
                     .border(2.dp, Color(0xFFE74C3C), shape = CircleShape)
-                    .clickable { onResetClick() },
+                    .clickable { 
+                        com.example.utils.SoundManager.playPop()
+                        onResetClick() 
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = "🔄", fontSize = 14.sp)

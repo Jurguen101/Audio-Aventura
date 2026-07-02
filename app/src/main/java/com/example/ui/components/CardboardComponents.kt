@@ -193,7 +193,10 @@ fun CardboardButton(
                 color = borderColor.copy(alpha = alpha),
                 shape = RoundedCornerShape(12.dp)
             )
-            .clickable(enabled = enabled, onClick = onClick)
+            .clickable(enabled = enabled, onClick = {
+                com.example.utils.SoundManager.playPop()
+                onClick()
+            })
             .padding(horizontal = 16.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {

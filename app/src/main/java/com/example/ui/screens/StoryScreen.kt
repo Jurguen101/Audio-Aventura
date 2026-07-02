@@ -249,6 +249,7 @@ fun StoryScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
+                            com.example.utils.SoundManager.playPop()
                             if (isSpeaking) {
                                 viewModel.stopSpeaking()
                             } else {
@@ -322,7 +323,10 @@ fun StoryScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { showVoiceSettings = !showVoiceSettings }
+                        .clickable { 
+                            com.example.utils.SoundManager.playPop()
+                            showVoiceSettings = !showVoiceSettings 
+                        }
                         .padding(vertical = 4.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
@@ -376,7 +380,10 @@ fun StoryScreen(
                                         Box(
                                             modifier = Modifier
                                                 .weight(1f)
-                                                .clickable { viewModel.setNarratorSpeed(speedVal) }
+                                                .clickable { 
+                                                    com.example.utils.SoundManager.playPop()
+                                                    viewModel.setNarratorSpeed(speedVal) 
+                                                }
                                                 .background(
                                                     if (isSelected) selectedBg else Color.Transparent,
                                                     RoundedCornerShape(8.dp)
@@ -422,7 +429,10 @@ fun StoryScreen(
                                         Box(
                                             modifier = Modifier
                                                 .weight(1f)
-                                                .clickable { viewModel.setNarratorPitch(pitchVal) }
+                                                .clickable { 
+                                                    com.example.utils.SoundManager.playPop()
+                                                    viewModel.setNarratorPitch(pitchVal) 
+                                                }
                                                 .background(
                                                     if (isSelected) selectedBg else Color.Transparent,
                                                     RoundedCornerShape(8.dp)

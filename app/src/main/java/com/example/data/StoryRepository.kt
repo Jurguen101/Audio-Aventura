@@ -35,6 +35,12 @@ class StoryRepository(private val dao: AdventureDao) {
         }
     }
 
+    suspend fun equipCharacter(characterId: String) {
+        val current = dao.getUserProgress() ?: UserProgress(id = 1)
+        val updated = current.copy(activePetId = characterId)
+        dao.saveUserProgress(updated)
+    }
+
     suspend fun useWildcard(): Boolean {
         val current = dao.getUserProgress() ?: UserProgress(id = 1, starsCount = 0, wildcardsCount = 0)
         return if (current.wildcardsCount >= 1) {

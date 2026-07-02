@@ -35,6 +35,14 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
+        // Init SoundManager
+        val ctx = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            createAttributionContext("my_tag")
+        } else {
+            this
+        }
+        com.example.utils.SoundManager.init(ctx)
+        
         // Edge-to-edge design for immersive fullscreen experience
         enableEdgeToEdge()
 
@@ -61,12 +69,28 @@ class MainActivity : ComponentActivity() {
                         AnimatedContent(
                             targetState = currentScreen,
                             transitionSpec = {
-                                slideInHorizontally { width -> width } + fadeIn() togetherWith
-                                        slideOutHorizontally { width -> -width } + fadeOut()
+                                // Pop-up book style transition: Scale in with a bounce, fade out scaling up
+                                (scaleIn(
+                                    initialScale = 0.7f,
+                                    animationSpec = androidx.compose.animation.core.spring(
+                                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                                        stiffness = androidx.compose.animation.core.Spring.StiffnessLow
+                                    )
+                                ) + fadeIn(
+                                    animationSpec = androidx.compose.animation.core.tween(400)
+                                )) togetherWith (
+                                    scaleOut(
+                                        targetScale = 1.2f,
+                                        animationSpec = androidx.compose.animation.core.tween(400)
+                                    ) + fadeOut(
+                                        animationSpec = androidx.compose.animation.core.tween(400)
+                                    )
+                                )
                             },
                             label = "BookPageTurnTransition"
                         ) { screen ->
                             when (screen) {
+                                Screen.Credits -> com.example.ui.screens.CreditsScreen(viewModel = viewModel)
                                 Screen.Home -> HomeScreen(viewModel = viewModel)
                                 Screen.StoryPreview -> StoryPreviewScreen(viewModel = viewModel)
                                 Screen.Story -> StoryScreen(viewModel = viewModel)
@@ -78,6 +102,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        com.example.utils.SoundManager.release()
     }
 }
 

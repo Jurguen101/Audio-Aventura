@@ -49,7 +49,10 @@ fun ChunkyGameButton(
     val alpha = if (enabled) 1f else 0.5f
     Box(
         modifier = modifier
-            .clickable(enabled = enabled, onClick = onClick)
+            .clickable(enabled = enabled, onClick = {
+                com.example.utils.SoundManager.playPop()
+                onClick()
+            })
             .padding(bottom = 5.dp) // space for bevel
     ) {
         // Shadow/Bevel underneath
@@ -85,11 +88,16 @@ fun HomeScreen(
 ) {
     val chapters by viewModel.allChapters.collectAsState()
     val progress by viewModel.userProgress.collectAsState()
+    val characters by viewModel.allCharacters.collectAsState()
     val starsCount = progress?.starsCount ?: 0
     val wildcardsCount = progress?.wildcardsCount ?: 0
+    val activePetId = progress?.activePetId
+    val activePet = characters.find { it.id == activePetId }
     
     val narratorSpeed by viewModel.narratorSpeed.collectAsState()
     val narratorPitch by viewModel.narratorPitch.collectAsState()
+
+    var showResetWarning by remember { mutableStateOf(false) }
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
@@ -193,14 +201,27 @@ fun HomeScreen(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                                 modifier = Modifier.padding(2.dp)
                             ) {
-                                StickerCharacter(
-                                    emoji = "🦝",
-                                    size = 46.dp,
-                                    hasPedestal = true
-                                )
+                                if (activePet != null) {
+                                    Box(modifier = Modifier.clickable { 
+                                        com.example.utils.SoundManager.playPop()
+                                        viewModel.speakText(activePet.soundPhrase) 
+                                    }) {
+                                        StickerCharacter(
+                                            emoji = activePet.emoji,
+                                            size = 46.dp,
+                                            hasPedestal = true
+                                        )
+                                    }
+                                } else {
+                                    StickerCharacter(
+                                        emoji = "🦝",
+                                        size = 46.dp,
+                                        hasPedestal = true
+                                    )
+                                }
                                 Column {
                                     Text(
-                                        text = "¡Hola Aventurero!",
+                                        text = if (activePet != null) "Compañero: ${activePet.name}" else "¡Hola Aventurero!",
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Black,
                                         color = PaperMarioColors.BorderBrown
@@ -250,17 +271,9 @@ fun HomeScreen(
                                 onClick = { viewModel.navigateTo(Screen.Characters) },
                                 containerColor = Color(0xFFD32F2F),
                                 bevelColor = Color(0xFF991B1B),
-                                modifier = Modifier.weight(1.2f)
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Text("TIENDA 🎪", fontSize = 11.sp, fontWeight = FontWeight.Black, color = Color.White)
-                            }
-                            ChunkyGameButton(
-                                onClick = { viewModel.resetAllAppProgress() },
-                                containerColor = Color(0xFFFFF9F2),
-                                bevelColor = Color(0xFFDCD6CD),
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text("REINICIAR 🔄", fontSize = 10.sp, fontWeight = FontWeight.Black, color = PaperMarioColors.BorderBrown)
                             }
                         }
                     }
@@ -606,17 +619,126 @@ fun HomeScreen(
                             onClick = { viewModel.navigateTo(Screen.Characters) },
                             containerColor = Color(0xFFD32F2F),
                             bevelColor = Color(0xFF991B1B),
-                            modifier = Modifier.weight(1.2f)
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("TIENDA DE COMUNIDAD 🎪", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.White)
                         }
-                        ChunkyGameButton(
-                            onClick = { viewModel.resetAllAppProgress() },
-                            containerColor = Color(0xFFFFF9F2),
-                            bevelColor = Color(0xFFDCD6CD),
-                            modifier = Modifier.weight(0.9f)
+                    }
+                }
+            }
+        }
+
+        // Floating Top Corner Buttons (Music & Reset)
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Background Music Toggle
+            val isMusicOn by com.example.utils.SoundManager.isBgmEnabled
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { 
+                        com.example.utils.SoundManager.playPop()
+                        com.example.utils.SoundManager.toggleBgm()
+                    }
+            ) {
+                CardboardContainer(
+                    backgroundColor = PaperMarioColors.PaperWhite,
+                    cornerRadius = 10.dp,
+                    hasStitches = false,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(if (isMusicOn) "🎵" else "🔇", fontSize = 18.sp)
+                    }
+                }
+            }
+
+            // Reset Progress Button
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { 
+                        com.example.utils.SoundManager.playPop()
+                        showResetWarning = true 
+                    }
+            ) {
+                CardboardContainer(
+                    backgroundColor = PaperMarioColors.PaperWhite,
+                    cornerRadius = 10.dp,
+                    hasStitches = false,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("🔄", fontSize = 18.sp)
+                    }
+                }
+            }
+        }
+
+        // Reset Warning Dialog Overlay
+        if (showResetWarning) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .clickable { /* Block clicks */ },
+                contentAlignment = Alignment.Center
+            ) {
+                CardboardContainer(
+                    modifier = Modifier.widthIn(max = 400.dp).padding(24.dp),
+                    backgroundColor = Color(0xFFFFF9F2),
+                    cornerRadius = 16.dp,
+                    hasStitches = true
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "⚠️ ADVERTENCIA",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color(0xFFD32F2F)
+                        )
+                        Text(
+                            text = "¿Estás seguro de que quieres reiniciar TODO tu progreso? Perderás todas tus estrellas, comodines y personajes desbloqueados. ¡Esta acción no se puede deshacer!",
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center,
+                            color = PaperMarioColors.BorderBrown
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            Text("REINICIAR progress", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = PaperMarioColors.BorderBrown)
+                            ChunkyGameButton(
+                                onClick = { showResetWarning = false },
+                                containerColor = Color(0xFFBDC3C7),
+                                bevelColor = Color(0xFF7F8C8D),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("CANCELAR", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.White)
+                            }
+                            ChunkyGameButton(
+                                onClick = { 
+                                    viewModel.resetAllAppProgress()
+                                    showResetWarning = false
+                                },
+                                containerColor = Color(0xFFD32F2F),
+                                bevelColor = Color(0xFF991B1B),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("REINICIAR", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.White)
+                            }
                         }
                     }
                 }

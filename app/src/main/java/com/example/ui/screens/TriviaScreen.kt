@@ -14,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.activity.compose.BackHandler
 import com.example.ui.MainViewModel
 import com.example.ui.Screen
 import com.example.ui.components.*
@@ -44,6 +48,19 @@ fun TriviaScreen(
     val questions = viewModel.getActiveQuestions()
     val currentQuestion = questions.getOrNull(currentQuestionIndex)
 
+    var showExitDialog by remember { mutableStateOf(false) }
+
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+
+    BackHandler {
+        if (starsEarned > 0) {
+            showExitDialog = true
+        } else {
+            viewModel.navigateTo(Screen.Home)
+        }
+    }
+
     if (currentQuestion == null) {
         LaunchedEffect(Unit) {
             viewModel.navigateTo(Screen.Home)
@@ -54,6 +71,27 @@ fun TriviaScreen(
     // Speak question out loud when index updates
     LaunchedEffect(currentQuestionIndex) {
         viewModel.speakText("Pregunta número ${currentQuestionIndex + 1}. De dificultad: ${currentQuestion.difficultyLabel}. ${currentQuestion.questionText}")
+    }
+
+    if (showExitDialog) {
+        AlertDialog(
+            onDismissRequest = { showExitDialog = false },
+            title = { Text("¿Seguro que quieres salir?", fontWeight = FontWeight.Bold) },
+            text = { Text("Si sales ahora, perderás las $starsEarned estrellas que ganaste en estas preguntas.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showExitDialog = false
+                    viewModel.navigateTo(Screen.Home)
+                }) {
+                    Text("Sí, salir")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showExitDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 
     val infiniteTransition = rememberInfiniteTransition(label = "TriviaStarBreathing")
@@ -102,7 +140,13 @@ fun TriviaScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             CardboardButton(
-                onClick = { viewModel.navigateTo(Screen.Home) },
+                onClick = { 
+                    if (starsEarned > 0) {
+                        showExitDialog = true
+                    } else {
+                        viewModel.navigateTo(Screen.Home)
+                    }
+                },
                 containerColor = PaperMarioColors.PaperWhite
             ) {
                 Text(
@@ -178,87 +222,186 @@ fun TriviaScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // 1. TRIVIA QUESTION TEXT CARD
-        CardboardContainer(
-            modifier = Modifier.fillMaxWidth(),
-            backgroundColor = Color(0xFFFCF3CF), // Golden warm paper cutout
-            borderColor = PaperMarioColors.BorderBrown,
-            cornerRadius = 14.dp,
-            hasStitches = true
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Pregunta ${currentQuestionIndex + 1}",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Black,
-                    color = Color(0xFFD35400)
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = currentQuestion.questionText,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = PaperMarioColors.BorderBrown,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 24.sp
-                )
-            }
+        val shuffledOptions = remember(currentQuestion) {
+            currentQuestion.options.shuffled()
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // 2. CHOICES OPTIONS GRID (OR VERTICAL LIST)
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            currentQuestion.options.forEach { option ->
-                val isSelected = selectedOption == option
-                val optionBg = if (isSelected) Color(0xFFE8F8F5) else PaperMarioColors.PaperWhite
-                val optionBorder = if (isSelected) PaperMarioColors.GrassGreen else PaperMarioColors.BorderBrown
-
+        if (isLandscape) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // 1. TRIVIA QUESTION TEXT CARD
                 CardboardContainer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(enabled = !isAnswered) { viewModel.selectTriviaOption(option) },
-                    backgroundColor = optionBg,
-                    borderColor = optionBorder,
-                    cornerRadius = 12.dp,
-                    hasStitches = false
+                    modifier = Modifier.weight(1f),
+                    backgroundColor = Color(0xFFFCF3CF), // Golden warm paper cutout
+                    borderColor = PaperMarioColors.BorderBrown,
+                    cornerRadius = 14.dp,
+                    hasStitches = true
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.fillMaxWidth()
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxWidth().padding(8.dp)
                     ) {
-                        // Option circular bullet
-                        Box(
+                        Text(
+                            text = "Pregunta ${currentQuestionIndex + 1}",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color(0xFFD35400)
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = currentQuestion.questionText,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PaperMarioColors.BorderBrown,
+                            textAlign = TextAlign.Center,
+                            lineHeight = 24.sp
+                        )
+                    }
+                }
+
+                // 2. CHOICES OPTIONS GRID
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    shuffledOptions.forEachIndexed { index, option ->
+                        val isSelected = selectedOption == option
+                        val optionBg = if (isSelected) Color(0xFFE8F8F5) else PaperMarioColors.PaperWhite
+                        val optionBorder = if (isSelected) PaperMarioColors.GrassGreen else PaperMarioColors.BorderBrown
+                        val optionLetter = ('A' + index).toString()
+
+                        CardboardContainer(
                             modifier = Modifier
-                                .size(34.dp)
-                                .background(
-                                    if (isSelected) PaperMarioColors.GrassGreen else Color(0xFFF0F3F4),
-                                    shape = CircleShape
-                                )
-                                .border(1.5.dp, PaperMarioColors.BorderBrown, shape = CircleShape),
-                            contentAlignment = Alignment.Center
+                                .fillMaxWidth()
+                                .clickable(enabled = !isAnswered) { 
+                                    com.example.utils.SoundManager.playPop()
+                                    viewModel.selectTriviaOption(option) 
+                                },
+                            backgroundColor = optionBg,
+                            borderColor = optionBorder,
+                            cornerRadius = 12.dp,
+                            hasStitches = false
                         ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(34.dp)
+                                        .background(
+                                            if (isSelected) PaperMarioColors.GrassGreen else Color(0xFFF0F3F4),
+                                            shape = CircleShape
+                                        )
+                                        .border(1.5.dp, PaperMarioColors.BorderBrown, shape = CircleShape),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = if (isSelected) "✓" else optionLetter,
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) Color.White else PaperMarioColors.BorderBrown.copy(alpha = 0.6f)
+                                    )
+                                }
+                                Text(
+                                    text = option,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PaperMarioColors.BorderBrown
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            // 1. TRIVIA QUESTION TEXT CARD
+            CardboardContainer(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = Color(0xFFFCF3CF), // Golden warm paper cutout
+                borderColor = PaperMarioColors.BorderBrown,
+                cornerRadius = 14.dp,
+                hasStitches = true
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Pregunta ${currentQuestionIndex + 1}",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color(0xFFD35400)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = currentQuestion.questionText,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PaperMarioColors.BorderBrown,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 24.sp
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // 2. CHOICES OPTIONS GRID
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                shuffledOptions.forEachIndexed { index, option ->
+                    val isSelected = selectedOption == option
+                    val optionBg = if (isSelected) Color(0xFFE8F8F5) else PaperMarioColors.PaperWhite
+                    val optionBorder = if (isSelected) PaperMarioColors.GrassGreen else PaperMarioColors.BorderBrown
+                    val optionLetter = ('A' + index).toString()
+
+                    CardboardContainer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(enabled = !isAnswered) { 
+                                com.example.utils.SoundManager.playPop()
+                                viewModel.selectTriviaOption(option) 
+                            },
+                        backgroundColor = optionBg,
+                        borderColor = optionBorder,
+                        cornerRadius = 12.dp,
+                        hasStitches = false
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .background(
+                                        if (isSelected) PaperMarioColors.GrassGreen else Color(0xFFF0F3F4),
+                                        shape = CircleShape
+                                    )
+                                    .border(1.5.dp, PaperMarioColors.BorderBrown, shape = CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = if (isSelected) "✓" else optionLetter,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isSelected) Color.White else PaperMarioColors.BorderBrown.copy(alpha = 0.6f)
+                                )
+                            }
                             Text(
-                                text = if (isSelected) "✓" else option.take(2).trim(),
-                                fontSize = 13.sp,
+                                text = option,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isSelected) Color.White else PaperMarioColors.BorderBrown.copy(alpha = 0.6f)
+                                color = PaperMarioColors.BorderBrown
                             )
                         }
-
-                        Text(
-                            text = option.substring(3),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PaperMarioColors.BorderBrown
-                        )
                     }
                 }
             }

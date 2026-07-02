@@ -1,0 +1,109 @@
+package com.example.ui.screens
+
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.ui.MainViewModel
+import com.example.ui.Screen
+import kotlinx.coroutines.delay
+
+@Composable
+fun CreditsScreen(viewModel: MainViewModel) {
+    var stage by remember { mutableStateOf(0) } // 0: Blank, 1: Image 1, 2: Blank, 3: Image 2, 4: Done
+
+    LaunchedEffect(Unit) {
+        delay(500) // Initial blank screen
+        stage = 1 // Show Image 1
+        delay(2500) // Keep Image 1 visible
+        stage = 2 // Hide Image 1
+        delay(1000) // Wait for fade out + extra
+        stage = 3 // Show Image 2
+        delay(2500) // Keep Image 2 visible
+        stage = 4 // Hide Image 2
+        delay(1000) // Wait for fade out + extra
+        viewModel.navigateTo(Screen.Home)
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF38B6FF)),
+        contentAlignment = Alignment.Center
+    ) {
+        // Image 1
+        AnimatedVisibility(
+            visible = stage == 1,
+            enter = fadeIn(animationSpec = tween(800)),
+            exit = fadeOut(animationSpec = tween(800))
+        ) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val resId = try {
+                val id = context.resources.getIdentifier("creditos_1", "drawable", context.packageName)
+                if (id != 0) id else android.R.drawable.ic_menu_gallery
+            } catch (e: Exception) {
+                android.R.drawable.ic_menu_gallery
+            }
+            
+            Image(
+                painter = painterResource(id = resId),
+                contentDescription = "Créditos 1",
+                modifier = Modifier.fillMaxSize().padding(32.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+
+        // Image 2
+        AnimatedVisibility(
+            visible = stage == 3,
+            enter = fadeIn(animationSpec = tween(800)),
+            exit = fadeOut(animationSpec = tween(800))
+        ) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val resId = try {
+                val id = context.resources.getIdentifier("creditos_2", "drawable", context.packageName)
+                if (id != 0) id else android.R.drawable.ic_menu_gallery
+            } catch (e: Exception) {
+                android.R.drawable.ic_menu_gallery
+            }
+
+            Image(
+                painter = painterResource(id = resId),
+                contentDescription = "Créditos 2",
+                modifier = Modifier.fillMaxSize().padding(32.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+        
+        // Show instruction text if placeholder is used
+        if (stage == 1 || stage == 3) {
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val currentName = if (stage == 1) "creditos_1" else "creditos_2"
+            val id = context.resources.getIdentifier(currentName, "drawable", context.packageName)
+            if (id == 0) {
+                Text(
+                    text = "Falta imagen: Por favor sube '${currentName}.png'\na la carpeta app/src/main/res/drawable/",
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(32.dp)
+                )
+            }
+        }
+    }
+}

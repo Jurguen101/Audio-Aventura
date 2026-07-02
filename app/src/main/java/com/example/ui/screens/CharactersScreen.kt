@@ -49,16 +49,18 @@ fun CharactersScreen(
 
     var selectedCharacterId by remember { mutableStateOf<String?>(null) }
     val selectedCharacter = characters.find { it.id == selectedCharacterId }
+    var showConfetti by remember { mutableStateOf(false) }
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFE5D3B3)) // Cozy cardboard kraft base color
-    ) {
-        // Red Theater Canopy
+    Box(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFE5D3B3)) // Cozy cardboard kraft base color
+        ) {
+            // Red Theater Canopy
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -206,7 +208,13 @@ fun CharactersScreen(
 
                                     if (!isUnlocked) {
                                         CardboardButton(
-                                            onClick = { viewModel.buyCharacter(char.id) },
+                                            onClick = { 
+                                                if (starsCount >= 3) {
+                                                    showConfetti = true
+                                                    com.example.utils.SoundManager.playPop()
+                                                }
+                                                viewModel.buyCharacter(char.id) 
+                                            },
                                             containerColor = PaperMarioColors.GrassGreen,
                                             modifier = Modifier.fillMaxWidth()
                                         ) {
@@ -225,7 +233,7 @@ fun CharactersScreen(
                                             CardboardButton(
                                                 onClick = { viewModel.speakText(char.soundPhrase) },
                                                 containerColor = PaperMarioColors.SkyBlue,
-                                                modifier = Modifier.weight(1.1f)
+                                                modifier = Modifier.weight(1f)
                                             ) {
                                                 Text(
                                                     text = "🔊 ESCUCHAR",
@@ -236,12 +244,15 @@ fun CharactersScreen(
                                             }
 
                                             CardboardButton(
-                                                onClick = { selectedCharacterId = null },
-                                                containerColor = PaperMarioColors.PaperWhite,
-                                                modifier = Modifier.weight(0.9f)
+                                                onClick = { 
+                                                    viewModel.equipCharacter(char.id)
+                                                    selectedCharacterId = null
+                                                },
+                                                containerColor = Color(0xFFF1C40F),
+                                                modifier = Modifier.weight(1f)
                                             ) {
                                                 Text(
-                                                    text = "CERRAR X",
+                                                    text = "EQUIPAR 🐾",
                                                     fontSize = 10.sp,
                                                     fontWeight = FontWeight.Black,
                                                     color = PaperMarioColors.BorderBrown
@@ -359,7 +370,10 @@ fun CharactersScreen(
                                 CardboardContainer(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clickable { selectedCharacterId = null },
+                                        .clickable { 
+                                            com.example.utils.SoundManager.playPop()
+                                            selectedCharacterId = null 
+                                        },
                                     backgroundColor = if (isSelected) Color(0xFFFEF9E7) else PaperMarioColors.PaperWhite,
                                     borderColor = if (isSelected) Color(0xFFE67E22) else PaperMarioColors.BorderBrown,
                                     cornerRadius = 10.dp,
@@ -408,6 +422,7 @@ fun CharactersScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable {
+                                            com.example.utils.SoundManager.playPop()
                                             selectedCharacterId = character.id
                                             if (isUnlocked) {
                                                 viewModel.speakText(character.soundPhrase)
@@ -575,7 +590,13 @@ fun CharactersScreen(
 
                                 if (!isUnlocked) {
                                     CardboardButton(
-                                        onClick = { viewModel.buyCharacter(char.id) },
+                                        onClick = { 
+                                            if (starsCount >= 3) {
+                                                showConfetti = true
+                                                com.example.utils.SoundManager.playPop()
+                                            }
+                                            viewModel.buyCharacter(char.id) 
+                                        },
                                         containerColor = PaperMarioColors.GrassGreen,
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
@@ -594,10 +615,10 @@ fun CharactersScreen(
                                         CardboardButton(
                                             onClick = { viewModel.speakText(char.soundPhrase) },
                                             containerColor = PaperMarioColors.SkyBlue,
-                                            modifier = Modifier.weight(1.1f)
+                                            modifier = Modifier.weight(1f)
                                         ) {
                                             Text(
-                                                text = "🔊 REPRODUCIR VOZ",
+                                                text = "🔊 ESCUCHAR",
                                                 fontSize = 9.sp,
                                                 fontWeight = FontWeight.Black,
                                                 color = PaperMarioColors.BorderBrown
@@ -605,12 +626,15 @@ fun CharactersScreen(
                                         }
 
                                         CardboardButton(
-                                            onClick = { selectedCharacterId = null },
-                                            containerColor = PaperMarioColors.PaperWhite,
-                                            modifier = Modifier.weight(0.9f)
+                                            onClick = { 
+                                                viewModel.equipCharacter(char.id)
+                                                selectedCharacterId = null
+                                            },
+                                            containerColor = Color(0xFFF1C40F),
+                                            modifier = Modifier.weight(1f)
                                         ) {
                                             Text(
-                                                text = "CERRAR",
+                                                text = "EQUIPAR",
                                                 fontSize = 9.sp,
                                                 fontWeight = FontWeight.Black,
                                                 color = PaperMarioColors.BorderBrown
@@ -717,7 +741,10 @@ fun CharactersScreen(
                         CardboardContainer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable { selectedCharacterId = null },
+                                .clickable { 
+                                    com.example.utils.SoundManager.playPop()
+                                    selectedCharacterId = null 
+                                },
                             backgroundColor = if (isWildcardSelected) Color(0xFFFEF9E7) else PaperMarioColors.PaperWhite,
                             borderColor = if (isWildcardSelected) Color(0xFFE67E22) else PaperMarioColors.BorderBrown,
                             cornerRadius = 10.dp,
@@ -771,6 +798,7 @@ fun CharactersScreen(
                                         modifier = Modifier
                                             .weight(1f)
                                             .clickable {
+                                                com.example.utils.SoundManager.playPop()
                                                 selectedCharacterId = character.id
                                                 if (isUnlocked) {
                                                     viewModel.speakText(character.soundPhrase)
@@ -820,5 +848,10 @@ fun CharactersScreen(
                 }
             }
         }
+        
+        if (showConfetti) {
+            ConfettiEffect(onComplete = { showConfetti = false })
+        }
     }
+}
 }

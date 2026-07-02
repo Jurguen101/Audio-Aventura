@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 data class UserProgress(
     @PrimaryKey val id: Int = 1,
     val starsCount: Int = 0,
-    val wildcardsCount: Int = 0
+    val wildcardsCount: Int = 0,
+    val activePetId: String? = null
 )
 
 @Entity(tableName = "story_chapters")

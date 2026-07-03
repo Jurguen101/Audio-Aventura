@@ -435,11 +435,11 @@ fun DioramaAppWrapper(
                 .fillMaxSize()
                 .padding(0.dp)
                 .graphicsLayer {
-                    rotationX = 12f
-                    rotationY = -2f
-                    scaleX = 0.94f
-                    scaleY = 0.94f
-                    cameraDistance = 14 * density
+                    
+                    
+                    scaleX = 0.98f
+                    scaleY = 0.98f
+                    
                 },
             contentAlignment = Alignment.Center
         ) {

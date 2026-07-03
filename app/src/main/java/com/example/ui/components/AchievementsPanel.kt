@@ -39,9 +39,9 @@ val GameAchievements = listOf(
     Achievement(
         id = "collector",
         title = "Coleccionista",
-        description = "Desbloquea 2 personajes.",
+        description = "Desbloquea todos los personajes.",
         emoji = "🎒",
-        isUnlocked = { _, _, chars -> chars.count { it.unlocked } >= 2 }
+        isUnlocked = { _, _, chars -> chars.isNotEmpty() && chars.all { it.unlocked } }
     ),
     Achievement(
         id = "reader",
@@ -52,10 +52,10 @@ val GameAchievements = listOf(
     ),
     Achievement(
         id = "master",
-        title = "Maestro de Cartón",
-        description = "Gana 10 estrellas.",
+        title = "Gran Maestro de Cartón",
+        description = "Completa todos los cuentos con 5 estrellas.",
         emoji = "👑",
-        isUnlocked = { progress, _, _ -> progress.starsCount >= 10 }
+        isUnlocked = { _, chapters, _ -> chapters.isNotEmpty() && chapters.all { it.completed && it.starsEarned == 5 } }
     )
 )
 
@@ -103,8 +103,8 @@ fun AchievementMedal(
         cornerRadius = 12.dp,
         hasStitches = unlocked,
         modifier = Modifier
-            .width(100.dp)
-            .height(110.dp)
+            .width(120.dp)
+            .height(130.dp)
             .alpha(if (unlocked) 1f else 0.6f)
     ) {
         Column(
@@ -116,7 +116,7 @@ fun AchievementMedal(
         ) {
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(42.dp)
                     .background(Color.White, CircleShape)
                     .padding(6.dp),
                 contentAlignment = Alignment.Center
@@ -129,11 +129,13 @@ fun AchievementMedal(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = achievement.title,
-                fontSize = 10.sp,
+                fontSize = 11.sp,
                 fontWeight = FontWeight.Bold,
                 color = PaperMarioColors.BorderBrown,
                 textAlign = TextAlign.Center,
-                lineHeight = 12.sp
+                lineHeight = 13.sp,
+                maxLines = 2,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
         }
     }

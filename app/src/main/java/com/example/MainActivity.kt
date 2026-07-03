@@ -66,31 +66,31 @@ class MainActivity : ComponentActivity() {
                             .fillMaxSize()
                             .padding(innerPadding)
                     ) {
-                        com.example.ui.components.DioramaAppWrapper {
-                            // Beautiful clean animations when switching between the pop-up book pages
-                            AnimatedContent(
-                                targetState = currentScreen,
-                                transitionSpec = {
-                                    // Pop-up book style transition: Scale in with a bounce, fade out scaling up
-                                    (scaleIn(
-                                        initialScale = 0.7f,
-                                        animationSpec = androidx.compose.animation.core.spring(
-                                            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
-                                            stiffness = androidx.compose.animation.core.Spring.StiffnessLow
-                                        )
-                                    ) + fadeIn(
-                                        animationSpec = androidx.compose.animation.core.tween(400)
-                                    )) togetherWith (
-                                        scaleOut(
-                                            targetScale = 1.2f,
-                                            animationSpec = androidx.compose.animation.core.tween(400)
-                                        ) + fadeOut(
-                                            animationSpec = androidx.compose.animation.core.tween(400)
-                                        )
+                        // Beautiful clean animations when switching between the pop-up book pages
+                        AnimatedContent(
+                            targetState = currentScreen,
+                            transitionSpec = {
+                                // Pop-up book style transition: Scale in with a bounce, fade out scaling up
+                                (scaleIn(
+                                    initialScale = 0.7f,
+                                    animationSpec = androidx.compose.animation.core.spring(
+                                        dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+                                        stiffness = androidx.compose.animation.core.Spring.StiffnessLow
                                     )
-                                },
-                                label = "BookPageTurnTransition"
-                            ) { screen ->
+                                ) + fadeIn(
+                                    animationSpec = androidx.compose.animation.core.tween(400)
+                                )) togetherWith (
+                                    scaleOut(
+                                        targetScale = 1.2f,
+                                        animationSpec = androidx.compose.animation.core.tween(400)
+                                    ) + fadeOut(
+                                        animationSpec = androidx.compose.animation.core.tween(400)
+                                    )
+                                )
+                            },
+                            label = "BookPageTurnTransition"
+                        ) { screen ->
+                            val screenContent = @Composable {
                                 when (screen) {
                                     Screen.Credits -> com.example.ui.screens.CreditsScreen(viewModel = viewModel)
                                     Screen.FinalCredits -> FinalCreditsScreen(viewModel = viewModel)
@@ -99,6 +99,14 @@ class MainActivity : ComponentActivity() {
                                     Screen.Story -> StoryScreen(viewModel = viewModel)
                                     Screen.Trivia -> TriviaScreen(viewModel = viewModel)
                                     Screen.Characters -> CharactersScreen(viewModel = viewModel)
+                                }
+                            }
+                            
+                            if (screen == Screen.Credits || screen == Screen.FinalCredits) {
+                                screenContent()
+                            } else {
+                                com.example.ui.components.DioramaAppWrapper {
+                                    screenContent()
                                 }
                             }
                         }

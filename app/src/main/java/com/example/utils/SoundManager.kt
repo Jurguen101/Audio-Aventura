@@ -171,14 +171,14 @@ object SoundManager {
         val sampleRate = 44100
         val notes = when (theme) {
             "ninja" -> listOf(Pair(440.0, 0.5), Pair(523.25, 0.5), Pair(587.33, 0.5), Pair(659.25, 0.5), Pair(880.0, 1.0)) // A minor pentatonic
-            "fantasma" -> listOf(Pair(523.25, 1.0), Pair(554.37, 1.0), Pair(523.25, 1.0), Pair(587.33, 2.0)) // Creepy semitones
+            "fantasma" -> listOf(Pair(220.0, 1.0), Pair(261.63, 1.0), Pair(329.63, 1.0), Pair(415.30, 1.0), Pair(392.00, 2.0), Pair(329.63, 1.0), Pair(261.63, 1.0), Pair(220.0, 2.0)) // Haunting A minor melody
             "vaquero" -> listOf(Pair(196.0, 0.5), Pair(293.66, 0.5), Pair(196.0, 0.5), Pair(329.63, 0.5), Pair(196.0, 1.0)) // Country bounce G
             "rey" -> listOf(Pair(261.63, 1.0), Pair(392.0, 1.0), Pair(523.25, 2.0), Pair(392.0, 1.0), Pair(523.25, 2.0)) // Fanfare C
             "robot" -> listOf(Pair(261.63, 0.25), Pair(329.63, 0.25), Pair(392.0, 0.25), Pair(523.25, 0.25), Pair(392.0, 0.25), Pair(329.63, 0.25), Pair(261.63, 1.0)) // Arpeggiator
-            "dragon" -> listOf(Pair(65.41, 1.0), Pair(77.78, 1.0), Pair(98.0, 2.0)) // Deep menacing C min
+            "dragon" -> listOf(Pair(110.0, 0.6), Pair(0.0, 0.1), Pair(110.0, 0.6), Pair(0.0, 0.1), Pair(130.81, 0.6), Pair(146.83, 0.6), Pair(110.0, 1.2)) // Epic low brass riff with pauses
             "pirata" -> listOf(Pair(261.63, 0.33), Pair(329.63, 0.33), Pair(392.0, 0.33), Pair(523.25, 1.0)) // Sea shanty 6/8
-            "astronauta" -> listOf(Pair(523.25, 2.0), Pair(493.88, 2.0), Pair(392.0, 4.0)) // Ambient drift
-            "ardilla" -> listOf(Pair(1046.5, 0.1), Pair(1318.5, 0.1), Pair(1046.5, 0.1), Pair(1567.98, 0.5)) // Crazy high pitched
+            "astronauta" -> listOf(Pair(523.25, 0.4), Pair(587.33, 0.4), Pair(659.25, 0.4), Pair(783.99, 0.4), Pair(880.00, 0.8), Pair(783.99, 0.8), Pair(987.77, 0.4), Pair(1046.50, 0.8)) // Cosmic retro synth melody
+            "ardilla" -> listOf(Pair(392.00, 0.3), Pair(440.00, 0.3), Pair(493.88, 0.3), Pair(587.33, 0.6)) // Playful low squirrel bounce
             "mago" -> listOf(Pair(261.63, 0.5), Pair(293.66, 0.5), Pair(329.63, 0.5), Pair(369.99, 0.5), Pair(415.30, 2.0)) // Whole tone mysterious
             else -> listOf(Pair(261.63, 2.0), Pair(329.63, 2.0), Pair(392.0, 2.0))
         }
@@ -203,9 +203,11 @@ object SoundManager {
                         envelope = Math.exp(-2.0 * tNote)
                     }
                     "fantasma" -> {
-                        val vibrato = Math.sin(2.0 * Math.PI * 6.0 * tNote) * 10.0
-                        wave = Math.sin(2.0 * Math.PI * (freq + vibrato) * tNote) // Theremin
-                        envelope = if (tNote < 0.5) tNote * 2.0 else Math.exp(-1.0 * (tNote - 0.5))
+                        val vibrato = Math.sin(2.0 * Math.PI * 4.5 * tNote) * 3.5
+                        val main = Math.sin(2.0 * Math.PI * (freq + vibrato) * tNote)
+                        val overTone = 0.3 * Math.sin(2.0 * Math.PI * (freq * 1.5 + vibrato) * tNote) // Perfect fifth overtone
+                        wave = (main + overTone) * 0.7
+                        envelope = Math.sin(Math.PI * (tNote / duration)) * 0.8 // Ethereal slow swell & decay
                     }
                     "vaquero" -> {
                         wave = (Math.sin(2.0 * Math.PI * freq * tNote) > 0).compareTo(false).toDouble() * 0.5 // Square wave
@@ -220,21 +222,31 @@ object SoundManager {
                         envelope = Math.exp(-10.0 * tNote)
                     }
                     "dragon" -> {
-                        wave = Math.sin(2.0 * Math.PI * freq * tNote) + 0.3 * ((tNote * freq) % 1.0 - 0.5) // Deep growl
-                        envelope = 1.0
+                        if (freq == 0.0) {
+                            wave = 0.0
+                            envelope = 0.0
+                        } else {
+                            val wave1 = Math.sin(2.0 * Math.PI * freq * tNote)
+                            val wave2 = ((tNote * freq) % 1.0) - 0.5 // Sawtooth growl
+                            wave = (wave1 + 0.4 * wave2) * 0.7
+                            envelope = Math.exp(-4.5 * tNote) // Fast decay prevents constant beep
+                        }
                     }
                     "pirata" -> {
                         wave = Math.sin(2.0 * Math.PI * freq * tNote) + 0.5 * Math.sin(2.0 * Math.PI * freq * 3 * tNote) // Accordion-ish
                         envelope = Math.exp(-3.0 * tNote)
                     }
                     "astronauta" -> {
-                        val slide = Math.exp(-0.5 * tTotal)
-                        wave = Math.sin(2.0 * Math.PI * freq * slide * tNote) // Gliding synth
-                        envelope = Math.sin(Math.PI * (currentSample.toDouble() / numSamples)) // Swell
+                        // Cosmic retro synth: clear sine with gentle vibrato and a high chime overtone
+                        val vibrato = Math.sin(2.0 * Math.PI * 6.0 * tNote) * 2.0
+                        val main = Math.sin(2.0 * Math.PI * (freq + vibrato) * tNote)
+                        val chime = 0.35 * Math.sin(2.0 * Math.PI * (freq * 2.0 + vibrato) * tNote)
+                        wave = (main + chime) * 0.7
+                        envelope = Math.exp(-4.0 * tNote) // Sweet percussive bell/synth envelope
                     }
                     "ardilla" -> {
                         wave = Math.sin(2.0 * Math.PI * freq * tNote)
-                        envelope = Math.exp(-15.0 * tNote)
+                        envelope = Math.exp(-12.0 * tNote) * 0.20 // Extremely soft, short, bouncy wood block
                     }
                     "mago" -> {
                         wave = Math.sin(2.0 * Math.PI * freq * tNote) * Math.sin(2.0 * Math.PI * (freq + 2.0) * tNote) // Bell/FM-like

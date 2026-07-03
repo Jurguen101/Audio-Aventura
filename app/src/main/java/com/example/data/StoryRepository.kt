@@ -298,8 +298,15 @@ class StoryRepository(private val dao: AdventureDao) {
     suspend fun completeChapter(chapterId: String, starsEarned: Int) {
         val chapter = dao.getChapter(chapterId)
         if (chapter != null) {
-            val maxStars = maxOf(chapter.starsEarned, starsEarned)
+            val previousBest = if (chapter.completed) chapter.starsEarned else 0
+            val netNewStars = maxOf(0, starsEarned - previousBest)
+            
+            val maxStars = maxOf(previousBest, starsEarned)
             dao.updateChapter(chapter.copy(completed = true, starsEarned = maxStars))
+            
+            if (netNewStars > 0) {
+                addStars(netNewStars)
+            }
             
             // Auto unlock next chapter
             val nextChapterId = when (chapterId) {

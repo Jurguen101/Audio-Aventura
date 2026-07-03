@@ -93,6 +93,14 @@ class MainViewModel(
     private val _narratorPitch = MutableStateFlow(1.05f)
     val narratorPitch: StateFlow<Float> = _narratorPitch.asStateFlow()
 
+    // Home Pager Page Persistence
+    private val _homePagerPageIndex = MutableStateFlow(0)
+    val homePagerPageIndex: StateFlow<Int> = _homePagerPageIndex.asStateFlow()
+
+    fun setHomePagerPageIndex(index: Int) {
+        _homePagerPageIndex.value = index
+    }
+
     fun setNarratorSpeed(speed: Float) {
         _narratorSpeed.value = speed
         tts?.setSpeechRate(speed)
@@ -315,7 +323,6 @@ class MainViewModel(
             val chapterWasNotCompleted = allChapters.value.find { it.id == chapterId }?.completed == false
             
             viewModelScope.launch {
-                repository.addStars(starsEarned)
                 repository.completeChapter(chapterId, starsEarned)
             }
             

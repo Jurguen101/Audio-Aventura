@@ -9,7 +9,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,10 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.MainViewModel
 import com.example.ui.Screen
+import com.example.ui.theme.StampFont
 import kotlinx.coroutines.delay
 
 @Composable
@@ -62,8 +69,8 @@ fun CreditsScreen(viewModel: MainViewModel) {
             Image(
                 painter = painterResource(id = resId),
                 contentDescription = "Créditos 1",
-                modifier = Modifier.fillMaxSize().padding(32.dp),
-                contentScale = ContentScale.Fit
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
         }
 
@@ -83,9 +90,36 @@ fun CreditsScreen(viewModel: MainViewModel) {
             Image(
                 painter = painterResource(id = resId),
                 contentDescription = "Créditos 2",
-                modifier = Modifier.fillMaxSize().padding(32.dp),
-                contentScale = ContentScale.Fit
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
+        }
+
+        // Loading display
+        AnimatedVisibility(
+            visible = stage == 2 || stage == 4,
+            enter = fadeIn(animationSpec = tween(500)),
+            exit = fadeOut(animationSpec = tween(500))
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
+            ) {
+                Text(
+                    text = "Cargando aventuras...",
+                    color = Color.White,
+                    fontSize = 28.sp,
+                    fontFamily = StampFont,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                CircularProgressIndicator(
+                    color = Color.White,
+                    strokeWidth = 4.dp,
+                    modifier = Modifier.size(36.dp)
+                )
+            }
         }
         
         // Show instruction text if placeholder is used
@@ -99,7 +133,7 @@ fun CreditsScreen(viewModel: MainViewModel) {
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.BottomCenter).padding(32.dp)
+                    modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
         }

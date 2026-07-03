@@ -18,8 +18,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material.icons.filled.VolumeOff
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarHalf
@@ -60,8 +61,13 @@ fun HomeScreen(
     val activePet = characters.find { it.id == activePetId }
 
     val totalPages = if (chapters.isNotEmpty()) chapters.size + 1 else 0
-    val pagerState = rememberPagerState(pageCount = { totalPages })
+    val homePagerPage by viewModel.homePagerPageIndex.collectAsState()
+    val pagerState = rememberPagerState(initialPage = homePagerPage, pageCount = { totalPages })
     val coroutineScope = rememberCoroutineScope()
+    
+    LaunchedEffect(pagerState.currentPage) {
+        viewModel.setHomePagerPageIndex(pagerState.currentPage)
+    }
     var showResetWarning by remember { mutableStateOf(false) }
     var selectedChapterForSynopsis by remember { mutableStateOf<StoryChapter?>(null) }
 
@@ -305,9 +311,9 @@ fun HomeScreen(
             ) {
                 androidx.compose.material3.Icon(
                     imageVector = if (com.example.utils.SoundManager.isBgmEnabled.value) 
-                        Icons.Filled.Notifications 
+                        Icons.Filled.VolumeUp 
                     else 
-                        Icons.Filled.Close,
+                        Icons.Filled.VolumeOff,
                     contentDescription = "Toggle BGM",
                     tint = Color.White
                 )
@@ -319,7 +325,7 @@ fun HomeScreen(
                     .size(40.dp)
             ) {
                 androidx.compose.material3.Icon(
-                    imageVector = Icons.Filled.Refresh,
+                    imageVector = Icons.Filled.Delete,
                     contentDescription = "Reset Progress",
                     tint = Color.White
                 )

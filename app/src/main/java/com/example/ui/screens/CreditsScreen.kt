@@ -32,17 +32,13 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun CreditsScreen(viewModel: MainViewModel) {
-    var stage by remember { mutableStateOf(0) } // 0: Blank, 1: Image 1, 2: Blank, 3: Image 2, 4: Done
+    var stage by remember { mutableStateOf(0) } // 0: Blank, 1: Image 1, 2: Loading/Done
     LaunchedEffect(Unit) {
         delay(500) // Initial blank screen
         stage = 1 // Show Image 1
         delay(2500) // Keep Image 1 visible
-        stage = 2 // Hide Image 1
-        delay(1000) // Wait for fade out + extra
-        stage = 3 // Show Image 2
-        delay(2500) // Keep Image 2 visible
-        stage = 4 // Hide Image 2
-        delay(1000) // Wait for fade out + extra
+        stage = 2 // Hide Image 1 and show loading
+        delay(1500) // Wait showing loading
         viewModel.navigateTo(Screen.Home)
     }
 
@@ -74,30 +70,9 @@ fun CreditsScreen(viewModel: MainViewModel) {
             )
         }
 
-        // Image 2
-        AnimatedVisibility(
-            visible = stage == 3,
-            enter = fadeIn(animationSpec = tween(800)),
-            exit = fadeOut(animationSpec = tween(800))
-        ) {
-            val context = androidx.compose.ui.platform.LocalContext.current
-            val resId = try {
-                val id = context.resources.getIdentifier("creditos_2", "drawable", context.packageName)
-                if (id != 0) id else android.R.drawable.ic_menu_gallery
-            } catch (e: Exception) {
-                android.R.drawable.ic_menu_gallery
-            }
-            Image(
-                painter = painterResource(id = resId),
-                contentDescription = "Créditos 2",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
-
         // Loading display
         AnimatedVisibility(
-            visible = stage == 2 || stage == 4,
+            visible = stage == 2,
             enter = fadeIn(animationSpec = tween(500)),
             exit = fadeOut(animationSpec = tween(500))
         ) {
@@ -123,13 +98,12 @@ fun CreditsScreen(viewModel: MainViewModel) {
         }
         
         // Show instruction text if placeholder is used
-        if (stage == 1 || stage == 3) {
+        if (stage == 1) {
             val context = androidx.compose.ui.platform.LocalContext.current
-            val currentName = if (stage == 1) "creditos_1" else "creditos_2"
-            val id = context.resources.getIdentifier(currentName, "drawable", context.packageName)
+            val id = context.resources.getIdentifier("creditos_1", "drawable", context.packageName)
             if (id == 0) {
                 Text(
-                    text = "Falta imagen: Por favor sube '${currentName}.png'\na la carpeta app/src/main/res/drawable/",
+                    text = "Falta imagen: Por favor sube 'creditos_1.png'\na la carpeta app/src/main/res/drawable/",
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,

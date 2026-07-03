@@ -26,6 +26,10 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarHalf
 
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.example.ui.theme.StampFont
+import com.example.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -162,6 +166,31 @@ fun HomeScreen(
                                     Text("$wildcardsCount", fontSize = 20.sp, fontWeight = FontWeight.Black, color = PaperMarioColors.BorderBrown)
                                 }
                             }
+                        }
+
+                        // App Logo and Title
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 14.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.logo),
+                                contentDescription = "Logo AudioAventura",
+                                modifier = Modifier
+                                    .size(105.dp)
+                                    .padding(4.dp)
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Text(
+                                text = "AudioAventura",
+                                fontSize = 26.sp,
+                                fontFamily = StampFont,
+                                fontWeight = FontWeight.Black,
+                                color = PaperMarioColors.StageRed,
+                                textAlign = TextAlign.Center
+                            )
                         }
 
                         // Beautiful Tienda Button
